@@ -1,4 +1,4 @@
-package com.michalplachta.snake
+package com.michalplachta.pacman
 
 import akka.actor._
 import akka.event.slf4j.SLF4JLogging

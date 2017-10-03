@@ -1,4 +1,4 @@
-package com.michalplachta.snake
+package com.michalplachta.pacman
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.ws.Message
