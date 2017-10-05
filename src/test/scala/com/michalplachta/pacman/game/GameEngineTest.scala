@@ -86,6 +86,38 @@ class GameEngineTest extends WordSpec with Matchers {
     }
   }
 
+  "Player" should {
+    "be able to rotate and move the Pac-Man east" in new TwoByTwoEmptyGrid {
+      val initialState = GameState(PacMan(Position(0, 0), direction = South), grid)
+      val nextState = GameEngine.rotatePacMan(initialState, East)
+      nextState.pacMan should be(PacMan(Position(1, 0), direction = East))
+    }
+
+    "be able to rotate and move the Pac-Man west" in new TwoByTwoEmptyGrid {
+      val initialState = GameState(PacMan(Position(1, 0), direction = South), grid)
+      val nextState = GameEngine.rotatePacMan(initialState, West)
+      nextState.pacMan should be(PacMan(Position(0, 0), direction = West))
+    }
+
+    "be able to rotate and move the Pac-Man north" in new TwoByTwoEmptyGrid {
+      val initialState = GameState(PacMan(Position(1, 0), direction = West), grid)
+      val nextState = GameEngine.rotatePacMan(initialState, North)
+      nextState.pacMan should be(PacMan(Position(1, 1), direction = North))
+    }
+
+    "be able to rotate and move the Pac-Man south" in new TwoByTwoEmptyGrid {
+      val initialState = GameState(PacMan(Position(1, 1), direction = West), grid)
+      val nextState = GameEngine.rotatePacMan(initialState, South)
+      nextState.pacMan should be(PacMan(Position(1, 0), direction = South))
+    }
+
+    "not be able to rotate the Pac-Man into a wall" in new TwoByTwoWithEastWallGrid {
+      val initialState = GameState(PacMan(Position(1, 1), direction = North), grid)
+      val nextState = GameEngine.rotatePacMan(initialState, East)
+      nextState.pacMan should be(PacMan(Position(1, 0), direction = North))
+    }
+  }
+
   trait TwoByTwoEmptyGrid {
     val emptyCells = Set(Position(0, 0), Position(0, 1), Position(1, 0), Position(1, 1))
     val grid = Grid(width = 2, height = 2, emptyCells)

@@ -24,6 +24,15 @@ object GameEngine {
       gameState
   }
 
+  def rotatePacMan(gameState: GameState, newDirection: Direction): GameState = {
+    val possiblyNewGameState = tick(gameState.copy(pacMan = PacMan(gameState.pacMan.position, newDirection)))
+    if(possiblyNewGameState.pacMan.position != gameState.pacMan.position) {
+      possiblyNewGameState
+    } else {
+      tick(gameState)
+    }
+  }
+
   def isGridValid(grid: Grid): Boolean = {
     grid.width > 0 && grid.height > 0 && grid.emptyCells.forall(cell => cell.x < grid.width && cell.y < grid.height)
   }
