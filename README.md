@@ -3,7 +3,7 @@
 Companion project for Akka Streams/TDD workshop.
 
 * Test Driven Development (baby steps, starting with the game logic and moving towards HTTP).
-* Purely functional approach (separated data and behaviors).
+* Purely functional approach (separated data and behaviors, no exceptions, ADTs, `Option`s).
 * Modeling using immutable structures.
 * Making impossible states impossible.
 

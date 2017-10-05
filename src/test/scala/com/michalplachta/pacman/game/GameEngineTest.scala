@@ -72,6 +72,18 @@ class GameEngineTest extends WordSpec with Matchers {
       val nextState = GameEngine.tick(initialState)
       nextState.pacMan.position should be(Position(1, 0))
     }
+
+    "wrap Pac-Man around the grid (horizontally)" in new TwoByTwoEmptyGrid {
+      val initialState = GameState(PacMan(Position(1, 0), direction = East), grid)
+      val nextState = GameEngine.tick(initialState)
+      nextState.pacMan.position should be(Position(0, 0))
+    }
+
+    "wrap Pac-Man around the grid (vertically)" in new TwoByTwoWithEastWallGrid {
+      val initialState = GameState(PacMan(Position(1, 0), direction = North), grid)
+      val nextState = GameEngine.tick(initialState)
+      nextState.pacMan.position should be(Position(1, 1))
+    }
   }
 
   trait TwoByTwoEmptyGrid {
