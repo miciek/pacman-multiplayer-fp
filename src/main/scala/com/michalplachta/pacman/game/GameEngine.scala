@@ -9,7 +9,7 @@ object GameEngine {
     } else None
   }
 
-  def tick(gameState: GameState): GameState = {
+  def movePacMan(gameState: GameState): GameState = {
     val oldPosition = gameState.pacMan.position
     val newPosition = gameState.pacMan.direction match {
       case West => moveAndWrap(oldPosition, gameState.grid, dx = -1, dy = 0)
@@ -24,12 +24,12 @@ object GameEngine {
       gameState
   }
 
-  def rotatePacMan(gameState: GameState, newDirection: Direction): GameState = {
-    val possiblyNewGameState = tick(gameState.copy(pacMan = PacMan(gameState.pacMan.position, newDirection)))
+  def rotateAndMovePacMan(gameState: GameState, newDirection: Direction): GameState = {
+    val possiblyNewGameState = movePacMan(gameState.copy(pacMan = PacMan(gameState.pacMan.position, newDirection)))
     if(possiblyNewGameState.pacMan.position != gameState.pacMan.position) {
       possiblyNewGameState
     } else {
-      tick(gameState)
+      movePacMan(gameState)
     }
   }
 

@@ -26,7 +26,7 @@ Companion project for Akka Streams/TDD workshop.
   * Player cannot rotate Pac-Man into a wall.
   
 ### Dots
-  * An empty cell can have dot inside.
+  * An empty cell can have a dot inside.
   * Pac-Man eats a dot by going into a cell with dot inside.
   
 ### Gameplay
