@@ -19,9 +19,11 @@ object GameEngine {
     }
 
     if(isPositionLegal(gameState.grid, newPosition))
-      gameState.copy(pacMan = PacMan(newPosition, gameState.pacMan.direction))
-    else
-      gameState
+      gameState.copy(
+        pacMan = PacMan(newPosition, gameState.pacMan.direction),
+        dotCells = gameState.dotCells - newPosition
+      )
+    else gameState
   }
 
   def rotateAndMovePacMan(gameState: GameState, newDirection: Direction): GameState = {

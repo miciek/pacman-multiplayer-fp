@@ -138,6 +138,12 @@ class GameEngineTest extends WordSpec with Matchers {
 
       state should be(None)
     }
+
+    "remove a dot from a cell when Pac-Man enters it (eating a dot)" in new TwoByTwoEmptyGrid {
+      val initialState = GameState(PacMan(Position(0, 0), direction = East), grid, dotCells = emptyCells)
+      val nextState = GameEngine.movePacMan(initialState)
+      nextState.dotCells should be(emptyCells - Position(1, 0))
+    }
   }
 
   trait TwoByTwoEmptyGrid {
