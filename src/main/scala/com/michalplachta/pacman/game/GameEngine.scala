@@ -3,9 +3,9 @@ package com.michalplachta.pacman.game
 import com.michalplachta.pacman.game.data._
 
 object GameEngine {
-  def start(grid: Grid, initialPacMan: PacMan): Option[GameState] = {
-    if(isGridValid(grid) && isPositionLegal(grid, initialPacMan.position)) {
-      Some(GameState(initialPacMan, grid))
+  def start(grid: Grid, initialPacMan: PacMan, initialDotCells: Set[Position] = Set.empty): Option[GameState] = {
+    if(isGridValid(grid) && isPositionLegal(grid, initialPacMan.position) && areDotCellsLegal(grid, initialDotCells)) {
+      Some(GameState(initialPacMan, grid, initialDotCells))
     } else None
   }
 
@@ -39,6 +39,10 @@ object GameEngine {
 
   def isPositionLegal(grid: Grid, position: Position): Boolean = {
     grid.emptyCells.contains(position)
+  }
+
+  def areDotCellsLegal(grid: Grid, dotCells: Set[Position]): Boolean = {
+    dotCells.forall(dotCell => grid.emptyCells.contains(dotCell))
   }
 
   def moveAndWrap(position: Position, grid: Grid, dx: Int, dy: Int): Position = {

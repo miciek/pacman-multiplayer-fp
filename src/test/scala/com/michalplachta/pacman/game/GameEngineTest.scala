@@ -118,6 +118,28 @@ class GameEngineTest extends WordSpec with Matchers {
     }
   }
 
+  "Game engine (dots)" should {
+    "allow an empty cell to contain a dot inside" in {
+      val state = GameEngine.start(
+        Grid(width = 2, height = 2, emptyCells = Set(Position(0, 0))),
+        initialPacMan = PacMan(Position(0, 0), direction = West),
+        initialDotCells = Set(Position(0, 0))
+      )
+
+      state.map(_.dotCells) should be(Some(Set(Position(0, 0))))
+    }
+
+    "not allow a cell which is not empty to contain a dot inside" in {
+      val state = GameEngine.start(
+        Grid(width = 2, height = 2, emptyCells = Set(Position(0, 0))),
+        initialPacMan = PacMan(Position(0, 0), direction = West),
+        initialDotCells = Set(Position(1, 0))
+      )
+
+      state should be(None)
+    }
+  }
+
   trait TwoByTwoEmptyGrid {
     val emptyCells = Set(Position(0, 0), Position(0, 1), Position(1, 0), Position(1, 1))
     val grid = Grid(width = 2, height = 2, emptyCells)
