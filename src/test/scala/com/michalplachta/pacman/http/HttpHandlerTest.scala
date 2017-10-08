@@ -51,12 +51,12 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "allow getting the Pac-Man state in a game with given id" in new HandlerWithStartedGame {
-      Get("/games/1?clock=0") ~> handler.route ~> check {
+      Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
              |{
-             |  "clock": 0,
+             |  "step": 0,
              |  "pacMan": {
              |    "position": { "x": 1, "y": 1 },
              |    "direction": "east"
@@ -69,7 +69,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "allow setting a new direction of Pac-Man in a game with given id" in new HandlerWithStartedGame {
-      val entity = HttpEntity(`application/json`, """{ "clock": 0, "newDirection": "south" }""")
+      val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
       Put("/games/1", entity) ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.OK
