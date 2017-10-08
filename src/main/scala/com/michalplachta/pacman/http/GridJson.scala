@@ -2,8 +2,8 @@ package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.michalplachta.pacman.game.data.Grid
-import spray.json._
+import spray.json.DefaultJsonProtocol
 
-protected trait GridJsonSupport extends SprayJsonSupport with DefaultJsonProtocol with PositionJsonSupport {
+protected trait GridJson extends SprayJsonSupport with DefaultJsonProtocol with PositionJson {
   implicit val gridJsonFormat = jsonFormat3(Grid)
 }

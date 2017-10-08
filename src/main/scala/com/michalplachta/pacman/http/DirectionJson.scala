@@ -1,10 +1,9 @@
 package com.michalplachta.pacman.http
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.michalplachta.pacman.game.data._
 import spray.json._
 
-protected trait DirectionJsonSupport extends SprayJsonSupport {
+protected trait DirectionJson {
   implicit val directionFormat = new JsonFormat[Direction] {
     def read(json: JsValue): Direction = json match {
       case JsString("east") => East

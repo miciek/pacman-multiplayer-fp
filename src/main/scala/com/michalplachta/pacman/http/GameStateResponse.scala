@@ -6,6 +6,6 @@ import spray.json.DefaultJsonProtocol
 
 protected final case class GameStateResponse(clock: Int, pacMan: PacMan)
 
-protected object GameStateResponse extends SprayJsonSupport with DefaultJsonProtocol with PacManJsonSupport {
+protected object GameStateResponse extends SprayJsonSupport with DefaultJsonProtocol with PacManJson {
   implicit val gameStateResponseFormat = jsonFormat2(GameStateResponse.apply)
 }
