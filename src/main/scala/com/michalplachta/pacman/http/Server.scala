@@ -6,7 +6,7 @@ import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
 
 object Server extends HttpApp with GridJsonSupport {
   val route: Route =
-    path("grid" / "simpleSmall") {
+    path("grids" / "simpleSmall") {
       complete {
         val emptyCells: Set[Position] = (for {
           x <- 1 to 2

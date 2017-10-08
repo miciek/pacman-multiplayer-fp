@@ -10,7 +10,7 @@ import spray.json._
 class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
   "Server" should {
     "allow getting a particular grid configuration" in {
-      Get("/grid/simpleSmall") ~> Server.route ~> check {
+      Get("/grids/simpleSmall") ~> Server.route ~> check {
         contentType shouldEqual `application/json`
         val expected = {
           def c(x: Int, y: Int) = s"""{"x": $x, "y": $y}"""
