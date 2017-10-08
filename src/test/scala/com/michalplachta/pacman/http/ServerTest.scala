@@ -49,6 +49,24 @@ class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
         status shouldEqual StatusCodes.NotFound
       }
     }
+
+    "allow getting the Pac-Man state in a game with given id" in {
+      Get("/games/1?clock=0") ~> Server.route ~> check {
+        contentType shouldEqual `application/json`
+        val expected =
+          s"""
+             |{
+             |  "clock": 0,
+             |  "pacMan": {
+             |    "position": { "x": 1, "y": 1 },
+             |    "direction": "east"
+             |  }
+             |}
+          """.stripMargin
+
+        responseAs[String] should beJson(expected)
+      }
+    }
   }
 
   private def beJson(right: String) = new Matcher[String] {
