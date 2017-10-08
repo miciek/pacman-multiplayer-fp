@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{HttpApp, Route}
 import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
 
-object HttpHandler extends HttpApp with GridJson {
+class HttpHandler extends HttpApp with GridJson {
   val route: Route =
     path("grids" / "simpleSmall") {
       complete {
