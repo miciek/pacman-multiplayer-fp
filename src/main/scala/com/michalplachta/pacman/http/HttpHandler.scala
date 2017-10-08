@@ -3,8 +3,9 @@ package com.michalplachta.pacman.http
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{HttpApp, Route}
 import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
+import com.michalplachta.pacman.server.ServerState
 
-class HttpHandler extends HttpApp with GridJson {
+class HttpHandler(serverState: ServerState) extends HttpApp with GridJson {
   val route: Route =
     path("grids" / "simpleSmall") {
       complete {
@@ -27,7 +28,7 @@ class HttpHandler extends HttpApp with GridJson {
       }
     } ~
     path("games" / IntNumber) { gameId =>
-      if(gameId == 1) {
+      if(serverState.games.exists(_.id == gameId)) {
         get {
           complete(PacManStateResponse(step = 0, PacMan(Position(1, 1), direction = East)))
         } ~
