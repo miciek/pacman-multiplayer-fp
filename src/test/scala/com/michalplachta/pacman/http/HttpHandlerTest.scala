@@ -7,10 +7,10 @@ import org.scalatest.matchers.{MatchResult, Matcher}
 import org.scalatest.{Matchers, WordSpec}
 import spray.json._
 
-class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
+class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   "Server" should {
     "allow getting a particular grid configuration" in {
-      Get("/grids/simpleSmall") ~> Server.route ~> check {
+      Get("/grids/simpleSmall") ~> HttpHandler.route ~> check {
         contentType shouldEqual `application/json`
         val expected = {
           def c(x: Int, y: Int) = s"""{"x": $x, "y": $y}"""
@@ -29,7 +29,7 @@ class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
 
     "allow starting a new game in chosen grid configuration" in {
       val entity = HttpEntity(`application/json`, """{ "gridName": "simpleSmall" }""")
-      Post("/games", entity) ~> Server.route ~> check {
+      Post("/games", entity) ~> HttpHandler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
@@ -44,14 +44,14 @@ class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
 
     "not allow starting a new game in unknown grid configuration" in {
       val entity = HttpEntity(`application/json`, """{ "gridName": "non existing grid configuration" }""")
-      Post("/games", entity) ~> Server.route ~> check {
+      Post("/games", entity) ~> HttpHandler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.NotFound
       }
     }
 
     "allow getting the Pac-Man state in a game with given id" in {
-      Get("/games/1?clock=0") ~> Server.route ~> check {
+      Get("/games/1?clock=0") ~> HttpHandler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
@@ -70,7 +70,7 @@ class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
 
     "allow setting a new direction of Pac-Man in a game with given id" in {
       val entity = HttpEntity(`application/json`, """{ "clock": 0, "newDirection": "south" }""")
-      Put("/games/1", entity) ~> Server.route ~> check {
+      Put("/games/1", entity) ~> HttpHandler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.OK
       }
