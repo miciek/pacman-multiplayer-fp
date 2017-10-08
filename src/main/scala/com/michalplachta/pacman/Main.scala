@@ -1,6 +1,6 @@
 package com.michalplachta.pacman
 
-import com.michalplachta.pacman.game.http.Server
+import com.michalplachta.pacman.http.Server
 import com.typesafe.config.ConfigFactory
 
 object Main extends App {

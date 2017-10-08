@@ -1,4 +1,4 @@
-package com.michalplachta.pacman.game.http
+package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json.DefaultJsonProtocol

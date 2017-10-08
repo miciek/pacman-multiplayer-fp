@@ -1,4 +1,4 @@
-package com.michalplachta.pacman.game.http
+package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{HttpApp, Route}
