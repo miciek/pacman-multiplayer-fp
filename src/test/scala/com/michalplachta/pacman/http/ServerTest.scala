@@ -67,6 +67,14 @@ class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
         responseAs[String] should beJson(expected)
       }
     }
+
+    "allow setting a new direction of Pac-Man in a game with given id" in {
+      val entity = HttpEntity(`application/json`, """{ "clock": 0, "newDirection": "south" }""")
+      Put("/games/1", entity) ~> Server.route ~> check {
+        contentType shouldEqual `text/plain(UTF-8)`
+        status shouldEqual StatusCodes.OK
+      }
+    }
   }
 
   private def beJson(right: String) = new Matcher[String] {

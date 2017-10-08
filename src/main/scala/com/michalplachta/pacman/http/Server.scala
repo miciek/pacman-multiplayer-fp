@@ -27,12 +27,17 @@ object Server extends HttpApp with GridJson {
       }
     } ~
     path("games" / IntNumber) { gameId =>
-      get {
-        if(gameId == 1) {
+      if(gameId == 1) {
+        get {
           complete(GameStateResponse(clock = 0, PacMan(Position(1, 1), direction = East)))
-        } else {
-          complete((StatusCodes.NotFound, s"Game with the id $gameId couldn't be found"))
+        } ~
+        put {
+          entity(as[NewDirectionRequest]) { request =>
+            complete(StatusCodes.OK)
+          }
         }
+      } else {
+        complete((StatusCodes.NotFound, s"Game with the id $gameId couldn't be found"))
       }
     }
 
