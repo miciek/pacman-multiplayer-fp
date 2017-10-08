@@ -1,6 +1,7 @@
 package com.michalplachta.pacman.http
 
-import akka.http.scaladsl.model.ContentTypes.`application/json`
+import akka.http.scaladsl.model.ContentTypes._
+import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.michalplachta.pacman.game.http.Server
 import org.scalatest.matchers.{MatchResult, Matcher}
@@ -9,7 +10,7 @@ import spray.json._
 
 class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
   "Server" should {
-    "allow getting simple small grid configuration" in {
+    "allow getting a particular grid configuration" in {
       Get("/grid/simpleSmall") ~> Server.route ~> check {
         contentType shouldEqual `application/json`
         val expected = {
@@ -24,6 +25,29 @@ class ServerTest extends WordSpec with Matchers with ScalatestRouteTest {
         }
 
         responseAs[String] should beJson(expected)
+      }
+    }
+
+    "allow starting a new game in chosen grid configuration" in {
+      val entity = HttpEntity(`application/json`, """{ "gridName": "simpleSmall" }""")
+      Post("/games", entity) ~> Server.route ~> check {
+        contentType shouldEqual `application/json`
+        val expected =
+          s"""
+             |{
+             |  "gameId": 1
+             |}
+          """.stripMargin
+
+        responseAs[String] should beJson(expected)
+      }
+    }
+
+    "not allow starting a new game in unknown grid configuration" in {
+      val entity = HttpEntity(`application/json`, """{ "gridName": "non existing grid configuration" }""")
+      Post("/games", entity) ~> Server.route ~> check {
+        contentType shouldEqual `text/plain(UTF-8)`
+        status shouldEqual StatusCodes.NotFound
       }
     }
   }

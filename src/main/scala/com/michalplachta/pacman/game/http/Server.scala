@@ -1,5 +1,6 @@
 package com.michalplachta.pacman.game.http
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{HttpApp, Route}
 import com.michalplachta.pacman.game.data.{Grid, Position}
 
@@ -13,6 +14,17 @@ object Server extends HttpApp with GridJsonSupport {
             y <- 1 to 2
           } yield Position(x, y)).toSet
           Grid(width = 3, height = 3, emptyCells)
+        }
+      }
+    } ~
+    path("games") {
+      post {
+        entity(as[StartGameRequest]) { request =>
+          if(request.gridName == "simpleSmall") {
+            complete(StartGameResponse(gameId = 1))
+          } else {
+            complete((StatusCodes.NotFound, s"Grid with the name '${request.gridName}' couldn't be found"))
+          }
         }
       }
     }
