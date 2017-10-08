@@ -29,7 +29,7 @@ class HttpHandler extends HttpApp with GridJson {
     path("games" / IntNumber) { gameId =>
       if(gameId == 1) {
         get {
-          complete(GameStateResponse(clock = 0, PacMan(Position(1, 1), direction = East)))
+          complete(PacManStateResponse(step = 0, PacMan(Position(1, 1), direction = East)))
         } ~
         put {
           entity(as[NewDirectionRequest]) { request =>

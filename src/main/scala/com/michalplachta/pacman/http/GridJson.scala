@@ -5,5 +5,5 @@ import com.michalplachta.pacman.game.data.Grid
 import spray.json.DefaultJsonProtocol
 
 protected trait GridJson extends SprayJsonSupport with DefaultJsonProtocol with PositionJson {
-  implicit val gridJsonFormat = jsonFormat3(Grid)
+  implicit val gridFormat = jsonFormat3(Grid)
 }
