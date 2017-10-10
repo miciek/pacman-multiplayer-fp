@@ -3,9 +3,11 @@ package com.michalplachta.pacman.http
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{HttpApp, Route}
 import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
-import com.michalplachta.pacman.server.ServerState
+import com.michalplachta.pacman.server.{Server, ServerState}
 
-class HttpHandler(serverState: ServerState) extends HttpApp with GridJson {
+class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson {
+  private var serverState = initialServerState
+
   val route: Route =
     path("grids" / "simpleSmall") {
       complete {
@@ -20,7 +22,8 @@ class HttpHandler(serverState: ServerState) extends HttpApp with GridJson {
       post {
         entity(as[StartGameRequest]) { request =>
           if (request.gridName == "simpleSmall") {
-            complete(StartGameResponse(gameId = 1))
+            serverState = Server.startNewGame(serverState)
+            complete(StartGameResponse(serverState.games.last.id))
           } else {
             complete((StatusCodes.NotFound, s"Grid with the name '${request.gridName}' couldn't be found"))
           }
@@ -28,7 +31,7 @@ class HttpHandler(serverState: ServerState) extends HttpApp with GridJson {
       }
     } ~
     path("games" / IntNumber) { gameId =>
-      if(serverState.games.exists(_.id == gameId)) {
+      if(initialServerState.games.exists(_.id == gameId)) {
         get {
           complete(PacManStateResponse(step = 0, PacMan(Position(1, 1), direction = East)))
         } ~

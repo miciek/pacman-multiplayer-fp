@@ -28,14 +28,14 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow starting a new game in chosen grid configuration" in new HandlerWithNoGame {
+    "allow starting a new game in chosen grid configuration" in new HandlerWithOneStartedGame {
       val entity = HttpEntity(`application/json`, """{ "gridName": "simpleSmall" }""")
       Post("/games", entity) ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
              |{
-             |  "gameId": 1
+             |  "gameId": 2
              |}
           """.stripMargin
 
@@ -51,7 +51,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow getting the Pac-Man state in a game with given id" in new HandlerWithStartedGame {
+    "allow getting the Pac-Man state in a game with given id" in new HandlerWithOneStartedGame {
       Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
@@ -76,7 +76,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow setting a new direction of Pac-Man in a game with given id" in new HandlerWithStartedGame {
+    "allow setting a new direction of Pac-Man in a game with given id" in new HandlerWithOneStartedGame {
       val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
       Put("/games/1", entity) ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
@@ -89,7 +89,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     val handler = new HttpHandler(ServerState.clean)
   }
 
-  trait HandlerWithStartedGame {
+  trait HandlerWithOneStartedGame {
     val handler = new HttpHandler(Server.startNewGame(ServerState.clean))
   }
 
