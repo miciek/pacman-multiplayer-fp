@@ -22,8 +22,9 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
       post {
         entity(as[StartGameRequest]) { request =>
           if (request.gridName == "simpleSmall") {
-            serverState = Server.startNewGame(serverState)
-            complete(StartGameResponse(serverState.games.last.id))
+            val (newServerState, gameId) = Server.startNewGame(serverState)
+            serverState = newServerState
+            complete(StartGameResponse(gameId))
           } else {
             complete((StatusCodes.NotFound, s"Grid with the name '${request.gridName}' couldn't be found"))
           }
@@ -36,7 +37,7 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
           complete(PacManStateResponse(game.currentStep, game.pacMan))
         } ~
         put {
-          entity(as[NewDirectionRequest]) { request =>
+          entity(as[NewDirectionRequest]) { _ =>
             complete(StatusCodes.OK)
           }
         }
