@@ -71,7 +71,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "allow getting Pac-Man's next state" in new HandlerWithOneGame(gameId = 1, step = 1, PacMan(Position(2, 1), East)) {
-      Get("/games/1?step=1") ~> handler.route ~> check {
+      Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""

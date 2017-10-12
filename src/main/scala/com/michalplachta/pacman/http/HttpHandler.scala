@@ -5,8 +5,6 @@ import akka.http.scaladsl.server.{Directive1, HttpApp, Route}
 import com.michalplachta.pacman.game.data.{Grid, Position}
 import com.michalplachta.pacman.server.{Server, ServerGame, ServerState}
 
-import scala.util.Try
-
 class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson {
   private var serverState = initialServerState
 
@@ -33,31 +31,26 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
       }
     } ~
     path("games" / IntNumber) { gameId =>
-      parameterMap { params =>
-        val stepStr = params.getOrElse("step", "0")
-        gameFromState(gameId, stepStr) { game =>
-          get {
-            complete(PacManStateResponse(game.currentStep, game.pacMan))
-          } ~
-          put {
-            entity(as[NewDirectionRequest]) { request =>
-              complete(StatusCodes.OK)
-            }
-          }
+      gameFromState(gameId) { game =>
+        get {
+          complete(PacManStateResponse(game.currentStep, game.pacMan))
         } ~
-        complete((StatusCodes.NotFound, s"Game with the id $gameId and step $stepStr couldn't be found"))
-      }
+        put {
+          entity(as[NewDirectionRequest]) { request =>
+            complete(StatusCodes.OK)
+          }
+        }
+      } ~
+      complete((StatusCodes.NotFound, s"Game with the id $gameId couldn't be found"))
     }
 
   protected def routes: Route = route
 
-  private def gameFromState(gameId: Int, stepStr: String): Directive1[ServerGame] = {
-    val maybeGame = for {
-      step <- Try(stepStr.toInt).toOption
-      game <- serverState.games.find(_.id == gameId)
-      if game.currentStep == step
-    } yield game
-    maybeGame.map(provide).getOrElse(reject)
+  private def gameFromState(gameId: Int): Directive1[ServerGame] = {
+    serverState.games
+      .find(_.id == gameId)
+      .map(provide)
+      .getOrElse(reject)
   }
 }
 
