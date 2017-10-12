@@ -1,9 +1,11 @@
 package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{HttpApp, Route}
-import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
-import com.michalplachta.pacman.server.{Server, ServerState}
+import akka.http.scaladsl.server.{Directive1, HttpApp, Route}
+import com.michalplachta.pacman.game.data.{Grid, Position}
+import com.michalplachta.pacman.server.{Server, ServerGame, ServerState}
+
+import scala.util.Try
 
 class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson {
   private var serverState = initialServerState
@@ -31,20 +33,31 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
       }
     } ~
     path("games" / IntNumber) { gameId =>
-      if(initialServerState.games.exists(_.id == gameId)) {
-        get {
-          complete(PacManStateResponse(step = 0, PacMan(Position(1, 1), direction = East)))
-        } ~
-        put {
-          entity(as[NewDirectionRequest]) { request =>
-            complete(StatusCodes.OK)
+      parameterMap { params =>
+        val stepStr = params.getOrElse("step", "0")
+        gameFromState(gameId, stepStr) { game =>
+          get {
+            complete(PacManStateResponse(game.currentStep, game.pacMan))
+          } ~
+          put {
+            entity(as[NewDirectionRequest]) { request =>
+              complete(StatusCodes.OK)
+            }
           }
-        }
-      } else {
-        complete((StatusCodes.NotFound, s"Game with the id $gameId couldn't be found"))
+        } ~
+        complete((StatusCodes.NotFound, s"Game with the id $gameId and step $stepStr couldn't be found"))
       }
     }
 
   protected def routes: Route = route
+
+  private def gameFromState(gameId: Int, stepStr: String): Directive1[ServerGame] = {
+    val maybeGame = for {
+      step <- Try(stepStr.toInt).toOption
+      game <- serverState.games.find(_.id == gameId)
+      if game.currentStep == step
+    } yield game
+    maybeGame.map(provide).getOrElse(reject)
+  }
 }
 

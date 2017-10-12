@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.michalplachta.pacman.game.data.{East, PacMan, Position}
-import com.michalplachta.pacman.server.{Server, ServerGame, ServerState}
+import com.michalplachta.pacman.server.{ServerGame, ServerState}
 import org.scalatest.matchers.{MatchResult, Matcher}
 import org.scalatest.{Matchers, WordSpec}
 import spray.json._
@@ -70,15 +70,15 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow getting Pac-Man's changed state" in new HandlerWithOneGame(gameId = 1, step = 0, PacMan(Position(1, 1), East)) {
+    "allow getting Pac-Man's next state" in new HandlerWithOneGame(gameId = 1, step = 1, PacMan(Position(2, 1), East)) {
       Get("/games/1?step=1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
              |{
-             |  "step": 0,
+             |  "step": 1,
              |  "pacMan": {
-             |    "position": { "x": 1, "y": 1 },
+             |    "position": { "x": 2, "y": 1 },
              |    "direction": "east"
              |  }
              |}
@@ -109,7 +109,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   }
 
   class HandlerWithOneGame(gameId: Int, step: Int, pacMan: PacMan) {
-    val handler = new HttpHandler(ServerState(Set.empty, Set(ServerGame(gameId, step)), nextGameId = gameId + 1))
+    val handler = new HttpHandler(ServerState(Set.empty, Set(ServerGame(gameId, step, pacMan)), nextGameId = gameId + 1))
   }
 
   private def beJson(right: String) = new Matcher[String] {
