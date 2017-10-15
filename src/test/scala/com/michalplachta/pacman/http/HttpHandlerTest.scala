@@ -52,25 +52,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow getting Pac-Man's initial state" in new HandlerWithOneGame(gameId = 1, step = 0, PacMan(Position(1, 1), East)) {
-      Get("/games/1") ~> handler.route ~> check {
-        contentType shouldEqual `application/json`
-        val expected =
-          s"""
-             |{
-             |  "step": 0,
-             |  "pacMan": {
-             |    "position": { "x": 1, "y": 1 },
-             |    "direction": "east"
-             |  }
-             |}
-          """.stripMargin
-
-        responseAs[String] should beJson(expected)
-      }
-    }
-
-    "allow getting Pac-Man's next state" in new HandlerWithOneGame(gameId = 1, step = 1, PacMan(Position(2, 1), East)) {
+    "allow getting Pac-Man's state in existing game" in new HandlerWithOneGame(gameId = 1, step = 1, PacMan(Position(2, 1), East)) {
       Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
@@ -88,7 +70,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow getting the Pac-Man state" in new HandlerWithNoGame {
+    "not allow getting the Pac-Man state when there's no game" in new HandlerWithNoGame {
       Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.NotFound
