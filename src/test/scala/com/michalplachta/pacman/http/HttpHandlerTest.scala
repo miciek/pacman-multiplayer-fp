@@ -86,11 +86,11 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
   }
 
-  trait HandlerWithNoGame {
+  private trait HandlerWithNoGame {
     val handler = new HttpHandler(ServerState.clean)
   }
 
-  class HandlerWithOneGame(gameId: Int, step: Int, pacMan: PacMan) {
+  private class HandlerWithOneGame(gameId: Int, step: Int, pacMan: PacMan) {
     val handler = new HttpHandler(ServerState(Set.empty, Set(ServerGame(gameId, step, pacMan)), nextGameId = gameId + 1))
   }
 
