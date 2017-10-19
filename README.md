@@ -1,6 +1,6 @@
-# Pac-Man Multiplayer using Akka Streams
+# Workshop: TDDing Reliable Web Apps
 
-Companion project for Akka Streams/TDD workshop.
+Get some theoretical and practical overview of the TDD approach and Reactive Streams by creating a multiplayer Pac-Man game server.
 
 * Test Driven Development (baby steps, starting with the game logic and moving towards HTTP).
 * Purely functional approach (separated data and behaviors, no exceptions, ADTs, `Option`s).
