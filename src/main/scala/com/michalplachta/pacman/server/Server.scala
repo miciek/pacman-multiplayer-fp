@@ -21,9 +21,13 @@ object Server {
   }
 
   def tick(state: ServerState): ServerState = {
-    state.copy(games = state.games.map { game =>
-      game.copy(pacMan = game.pacMan.copy(direction = game.pacMan.nextDirection.getOrElse(game.pacMan.direction), nextDirection = None))
-    })
+    state.copy(
+      games = state.games.map { game =>
+        game.copy(
+          pacMan = game.pacMan.copy(direction = game.pacMan.nextDirection.getOrElse(game.pacMan.direction), nextDirection = None),
+          currentStep = game.currentStep + 1
+        )
+      })
   }
 
   private def updateOneGame(games: Set[ServerGame], gameId: Int)(f: ServerGame => ServerGame): Set[ServerGame] = {
