@@ -19,8 +19,11 @@ class ServerTest extends WordSpec with Matchers {
     }
 
     "allow changing direction of Pac-Man" in new StateWithOneGame(step = 0, PacMan(Position(0, 0), direction = East)) {
-      val stateWithNewDirection = Server.changeDirection(state, gameId, newDirection = South)
-      val newState = Server.tick(stateWithNewDirection)
+      val stateWithChangedDirection = Server.changeDirection(state, gameId, newDirection = South)
+      stateWithChangedDirection.games.size should be(1)
+      stateWithChangedDirection.games.head.pacMan.direction should be (East)
+
+      val newState = Server.tick(stateWithChangedDirection)
       newState.games.size should be(1)
       newState.games.head.pacMan.direction should be (South)
     }

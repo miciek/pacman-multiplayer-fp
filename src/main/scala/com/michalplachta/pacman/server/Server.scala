@@ -2,6 +2,8 @@ package com.michalplachta.pacman.server
 
 import com.michalplachta.pacman.game.data.{Direction, North, PacMan, Position}
 
+// TODO: use State
+// TODO: use optics
 object Server {
   def startNewGame(state: ServerState): (ServerState, Int) = {
     val gameId = state.nextGameId
@@ -13,11 +15,21 @@ object Server {
   }
 
   def changeDirection(state: ServerState, gameId: Int, newDirection: Direction): ServerState = {
-    val otherGames: Set[ServerGame] = state.games.filterNot(_.id == gameId)
-    val maybeGame: Option[ServerGame] = state.games.find(_.id == gameId)
-    val updatedGame = maybeGame.map(game => game.copy(pacMan = game.pacMan.copy(direction = newDirection)))
-    state.copy(games = otherGames ++ updatedGame.toSet)
+    state.copy(games = updateOneGame(state.games, gameId) { game =>
+      game.copy(pacMan = game.pacMan.copy(nextDirection = Some(newDirection)))
+    })
   }
 
-  def tick(state: ServerState): ServerState = state
+  def tick(state: ServerState): ServerState = {
+    state.copy(games = state.games.map { game =>
+      game.copy(pacMan = game.pacMan.copy(direction = game.pacMan.nextDirection.getOrElse(game.pacMan.direction), nextDirection = None))
+    })
+  }
+
+  private def updateOneGame(games: Set[ServerGame], gameId: Int)(f: ServerGame => ServerGame): Set[ServerGame] = {
+    val otherGames: Set[ServerGame] = games.filterNot(_.id == gameId)
+    val maybeGame: Option[ServerGame] = games.find(_.id == gameId)
+    val updatedGame = maybeGame.map(f)
+    otherGames ++ updatedGame.toSet
+  }
 }
