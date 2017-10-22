@@ -4,7 +4,6 @@ import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.michalplachta.pacman.game.data._
-import com.michalplachta.pacman.server.{ServerGame, ServerState}
 import org.scalatest.matchers.{MatchResult, Matcher}
 import org.scalatest.{Matchers, WordSpec}
 import spray.json._
@@ -87,12 +86,16 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   }
 
   private trait HandlerWithNoGame {
-    val handler = new HttpHandler(ServerState.clean)
+    val handler = new HttpHandler[Int](0, s => (s + 1, s + 1), (_, _) => None, (_, _) => None)
   }
 
   private class HandlerWithOneGame(gameId: Int, step: Int, pacMan: PacMan) {
-    private val gameState: GameState = GameState(pacMan, Grid.simpleSmall, Set.empty)
-    val handler = new HttpHandler(ServerState(Set.empty, Set(ServerGame(gameId, step, gameState)), nextGameId = gameId + 1))
+    val handler = new HttpHandler[Int](
+      gameId,
+      _ => (gameId, gameId + 1),
+      (_, id) => if(id == gameId) Some(step) else None,
+      (_, id) => if(id == gameId) Some(pacMan) else None
+    )
   }
 
   private def beJson(right: String) = new Matcher[String] {

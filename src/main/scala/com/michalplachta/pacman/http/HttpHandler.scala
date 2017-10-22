@@ -2,11 +2,14 @@ package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directive1, HttpApp, Route}
-import com.michalplachta.pacman.game.data.{Grid, Position}
-import com.michalplachta.pacman.server.{Server, ServerGame, ServerState}
+import com.michalplachta.pacman.game.data.{Grid, PacMan}
 
-class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson {
-  private var serverState = initialServerState
+class HttpHandler[S](initialState: S,
+                     startNewGame: S => (S, Int),
+                     getCurrentStep: (S, Int) => Option[Int],
+                     getPacMan: (S, Int) => Option[PacMan]
+                    ) extends HttpApp with GridJson {
+  private var state: S = initialState
 
   val route: Route =
     path("grids" / "simpleSmall") {
@@ -16,8 +19,8 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
       post {
         entity(as[StartGameRequest]) { request =>
           if (request.gridName == "simpleSmall") {
-            val (newServerState, gameId) = Server.startNewGame(serverState)
-            serverState = newServerState
+            val (newServerState, gameId) = startNewGame(state)
+            state = newServerState
             complete(StartGameResponse(gameId))
           } else {
             complete((StatusCodes.NotFound, s"Grid with the name '${request.gridName}' couldn't be found"))
@@ -26,9 +29,9 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
       }
     } ~
     path("games" / IntNumber) { gameId =>
-      gameFromState(gameId) { game =>
+      pacManStateResponse(gameId) { pacManStateResponse =>
         get {
-          complete(PacManStateResponse(game.currentStep, game.gameState.pacMan))
+          complete(pacManStateResponse)
         } ~
         put {
           entity(as[NewDirectionRequest]) { _ =>
@@ -41,11 +44,12 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
 
   protected def routes: Route = route
 
-  private def gameFromState(gameId: Int): Directive1[ServerGame] = {
-    serverState.games
-      .find(_.id == gameId)
-      .map(provide)
-      .getOrElse(reject)
+  private def pacManStateResponse(gameId: Int): Directive1[PacManStateResponse] = {
+    val maybeResponse = for {
+      currentStep <- getCurrentStep(state, gameId)
+      pacMan <- getPacMan(state, gameId)
+    } yield PacManStateResponse(currentStep, pacMan)
+    maybeResponse.map(provide).getOrElse(reject)
   }
 }
 

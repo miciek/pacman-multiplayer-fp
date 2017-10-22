@@ -1,11 +1,15 @@
 # Workshop: TDDing Reliable Web Apps
 
-Get some theoretical and practical overview of the TDD approach and Reactive Streams by creating a multiplayer Pac-Man game server.
+Get some theoretical and practical overview of the TDD approach, Functional Programming & Reactive Streams by creating a multiplayer Pac-Man game server.
 
 * Test Driven Development (baby steps, starting with the game logic and moving towards HTTP).
 * Purely functional approach (separated data and behaviors, no exceptions, ADTs, `Option`s).
 * Modeling using immutable structures.
 * Making impossible states impossible.
+* Using optics to deal with immutable changing data.
+* Using function composition.
+* Using State monad.
+* Separate concerns by using functions as input parameters.
 
 ## Requirements
 

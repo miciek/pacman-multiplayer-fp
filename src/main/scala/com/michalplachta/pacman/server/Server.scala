@@ -16,6 +16,22 @@ object Server {
     (maybeNewState.getOrElse(state), gameId)
   }
 
+  def findServerGame(state: ServerState, gameId: Int): Option[ServerGame] = {
+    state.games.find(_.id == gameId)
+  }
+
+  // TODO: use function composition
+  def getCurrentStep(state: ServerState, gameId: Int): Option[Int] = {
+    val game = findServerGame(state, gameId)
+    game.map(_.currentStep)
+  }
+
+  // TODO: use function composition
+  def getPacMan(state: ServerState, gameId: Int): Option[PacMan] = {
+    val game = findServerGame(state, gameId)
+    game.map(_.gameState.pacMan)
+  }
+
   def changeDirection(state: ServerState, gameId: Int, newDirection: Direction): ServerState = {
     state.copy(games = updateOneGame(state.games, gameId) { game =>
       game.copy(gameState = GameEngine.rotatePacMan(game.gameState, newDirection))
