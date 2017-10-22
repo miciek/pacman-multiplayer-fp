@@ -1,5 +1,5 @@
 package com.michalplachta.pacman.server
 
-import com.michalplachta.pacman.game.data.PacMan
+import com.michalplachta.pacman.game.data.GameState
 
-final case class ServerGame(id: Int, currentStep: Int, pacMan: PacMan)
+final case class ServerGame(id: Int, currentStep: Int, gameState: GameState)

@@ -3,7 +3,7 @@ package com.michalplachta.pacman.http
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.michalplachta.pacman.game.data.{East, PacMan, Position}
+import com.michalplachta.pacman.game.data._
 import com.michalplachta.pacman.server.{ServerGame, ServerState}
 import org.scalatest.matchers.{MatchResult, Matcher}
 import org.scalatest.{Matchers, WordSpec}
@@ -91,7 +91,8 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   }
 
   private class HandlerWithOneGame(gameId: Int, step: Int, pacMan: PacMan) {
-    val handler = new HttpHandler(ServerState(Set.empty, Set(ServerGame(gameId, step, pacMan)), nextGameId = gameId + 1))
+    private val gameState: GameState = GameState(pacMan, Grid.simpleSmall, Set.empty)
+    val handler = new HttpHandler(ServerState(Set.empty, Set(ServerGame(gameId, step, gameState)), nextGameId = gameId + 1))
   }
 
   private def beJson(right: String) = new Matcher[String] {

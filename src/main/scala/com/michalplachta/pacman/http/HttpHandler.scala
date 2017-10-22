@@ -10,13 +10,7 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
 
   val route: Route =
     path("grids" / "simpleSmall") {
-      complete {
-        val emptyCells: Set[Position] = (for {
-          x <- 1 to 2
-          y <- 1 to 2
-        } yield Position(x, y)).toSet
-        Grid(width = 3, height = 3, emptyCells)
-      }
+      complete(Grid.simpleSmall)
     } ~
     path("games") {
       post {
@@ -34,7 +28,7 @@ class HttpHandler(initialServerState: ServerState) extends HttpApp with GridJson
     path("games" / IntNumber) { gameId =>
       gameFromState(gameId) { game =>
         get {
-          complete(PacManStateResponse(game.currentStep, game.pacMan))
+          complete(PacManStateResponse(game.currentStep, game.gameState.pacMan))
         } ~
         put {
           entity(as[NewDirectionRequest]) { _ =>

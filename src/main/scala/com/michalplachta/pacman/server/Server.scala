@@ -1,22 +1,24 @@
 package com.michalplachta.pacman.server
 
-import com.michalplachta.pacman.game.data.{Direction, North, PacMan, Position}
+import com.michalplachta.pacman.game.GameEngine
+import com.michalplachta.pacman.game.data._
 
 // TODO: use State
 // TODO: use optics
 object Server {
   def startNewGame(state: ServerState): (ServerState, Int) = {
-    val gameId = state.nextGameId
-    val newState = state.copy(
-      games = state.games + ServerGame(gameId, 0, PacMan(Position(0, 0), direction = North)),
+    val gameId = state.nextGameId // TODO returns improper value when game cannot be started
+    val maybeGameState: Option[GameState] = GameEngine.start(Grid.simpleSmall, PacMan(Position(1, 1), East, None), Set.empty)
+    val maybeNewState = maybeGameState.map(gameState => state.copy(
+      games = state.games + ServerGame(gameId, currentStep = 0, gameState),
       nextGameId = gameId + 1
-    )
-    (newState, gameId)
+    ))
+    (maybeNewState.getOrElse(state), gameId)
   }
 
   def changeDirection(state: ServerState, gameId: Int, newDirection: Direction): ServerState = {
     state.copy(games = updateOneGame(state.games, gameId) { game =>
-      game.copy(pacMan = game.pacMan.copy(nextDirection = Some(newDirection)))
+      game.copy(gameState = game.gameState.copy(pacMan = game.gameState.pacMan.copy(nextDirection = Some(newDirection))))
     })
   }
 
@@ -24,7 +26,7 @@ object Server {
     state.copy(
       games = state.games.map { game =>
         game.copy(
-          pacMan = game.pacMan.copy(direction = game.pacMan.nextDirection.getOrElse(game.pacMan.direction), nextDirection = None),
+          gameState = game.gameState.copy(pacMan = game.gameState.pacMan.copy(direction = game.gameState.pacMan.nextDirection.getOrElse(game.gameState.pacMan.direction), nextDirection = None)),
           currentStep = game.currentStep + 1
         )
       })
