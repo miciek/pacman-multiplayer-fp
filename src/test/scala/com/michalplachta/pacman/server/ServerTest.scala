@@ -35,7 +35,7 @@ class ServerTest extends WordSpec with Matchers {
   }
 
   private class StateWithOneGame(step: Int, pacMan: PacMan) {
-    private val gameState: GameState = GameState(pacMan, Grid.simpleSmall, Set.empty)
+    private val gameState: GameState = GameState(pacMan, Grid.noWalls, Set.empty)
     val gameId = 1
     val state: ServerState = ServerState(Set.empty, Set(ServerGame(gameId, step, gameState)), nextGameId = gameId + 1)
   }

@@ -10,4 +10,12 @@ object Grid {
     } yield Position(x, y)).toSet
     Grid(width = 3, height = 3, emptyCells)
   }
+
+  val noWalls = {
+    val emptyCells: Set[Position] = (for {
+      x <- 0 to 2
+      y <- 0 to 2
+    } yield Position(x, y)).toSet
+    Grid(width = 3, height = 3, emptyCells)
+  }
 }

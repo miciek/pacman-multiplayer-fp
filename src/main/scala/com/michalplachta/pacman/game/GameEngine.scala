@@ -11,28 +11,24 @@ object GameEngine {
 
   def movePacMan(gameState: GameState): GameState = {
     val oldPosition = gameState.pacMan.position
-    val newPosition = gameState.pacMan.direction match {
+    val newDirection = gameState.pacMan.nextDirection.getOrElse(gameState.pacMan.direction)
+    val newPosition = newDirection match {
       case West => moveAndWrap(oldPosition, gameState.grid, dx = -1, dy = 0)
       case East => moveAndWrap(oldPosition, gameState.grid, dx = 1, dy = 0)
       case North => moveAndWrap(oldPosition, gameState.grid, dx = 0, dy = -1)
       case South => moveAndWrap(oldPosition, gameState.grid, dx = 0, dy = 1)
     }
 
-    if(isPositionLegal(gameState.grid, newPosition))
+    if(isPositionLegal(gameState.grid, newPosition) && newPosition != oldPosition)
       gameState.copy(
-        pacMan = PacMan(newPosition, gameState.pacMan.direction),
+        pacMan = PacMan(newPosition, newDirection, None),
         dotCells = gameState.dotCells - newPosition
       )
     else gameState
   }
 
-  def rotateAndMovePacMan(gameState: GameState, newDirection: Direction): GameState = {
-    val possiblyNewGameState = movePacMan(gameState.copy(pacMan = PacMan(gameState.pacMan.position, newDirection)))
-    if(possiblyNewGameState.pacMan.position != gameState.pacMan.position) {
-      possiblyNewGameState
-    } else {
-      movePacMan(gameState)
-    }
+  def rotatePacMan(gameState: GameState, newDirection: Direction): GameState = {
+    gameState.copy(pacMan = gameState.pacMan.copy(nextDirection = Some(newDirection)))
   }
 
   def isGridValid(grid: Grid): Boolean = {

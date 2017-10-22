@@ -18,7 +18,7 @@ object Server {
 
   def changeDirection(state: ServerState, gameId: Int, newDirection: Direction): ServerState = {
     state.copy(games = updateOneGame(state.games, gameId) { game =>
-      game.copy(gameState = game.gameState.copy(pacMan = game.gameState.pacMan.copy(nextDirection = Some(newDirection))))
+      game.copy(gameState = GameEngine.rotatePacMan(game.gameState, newDirection))
     })
   }
 
@@ -26,7 +26,7 @@ object Server {
     state.copy(
       games = state.games.map { game =>
         game.copy(
-          gameState = game.gameState.copy(pacMan = game.gameState.pacMan.copy(direction = game.gameState.pacMan.nextDirection.getOrElse(game.gameState.pacMan.direction), nextDirection = None)),
+          gameState = GameEngine.movePacMan(game.gameState),
           currentStep = game.currentStep + 1
         )
       })
