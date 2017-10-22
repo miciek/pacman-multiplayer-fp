@@ -28,7 +28,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow starting a new game in chosen grid configuration" in new HandlerWithOneGame(gameId = 1, step = 0, PacMan(Position(1, 1), East)) {
+    "allow starting a new game in chosen grid configuration" in new HandlerWithOneGame(gameId = 1, PacMan(Position(1, 1), East)) {
       val entity = HttpEntity(`application/json`, """{ "gridName": "simpleSmall" }""")
       Post("/games", entity) ~> handler.route ~> check {
         contentType shouldEqual `application/json`
@@ -51,13 +51,12 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow getting Pac-Man's state in existing game" in new HandlerWithOneGame(gameId = 1, step = 1, PacMan(Position(2, 1), East)) {
+    "allow getting Pac-Man's state in existing game" in new HandlerWithOneGame(gameId = 1, PacMan(Position(2, 1), East)) {
       Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
              |{
-             |  "step": 1,
              |  "pacMan": {
              |    "position": { "x": 2, "y": 1 },
              |    "direction": "east"
@@ -76,9 +75,9 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow setting a new direction of Pac-Man" in new HandlerWithOneGame(gameId = 1, step = 0, PacMan(Position(1, 1), East)) {
+    "allow setting a new direction of Pac-Man" in new HandlerWithOneGame(gameId = 1, PacMan(Position(1, 1), East)) {
       val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
-      Put("/games/1", entity) ~> handler.route ~> check {
+      Put("/games/1/direction", entity) ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.OK
       }
@@ -86,14 +85,13 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   }
 
   private trait HandlerWithNoGame {
-    val handler = new HttpHandler[Int](0, s => (s + 1, s + 1), (_, _) => None, (_, _) => None)
+    val handler = new HttpHandler[Int](0, s => (s + 1, s + 1), (_, _) => None)
   }
 
-  private class HandlerWithOneGame(gameId: Int, step: Int, pacMan: PacMan) {
+  private class HandlerWithOneGame(gameId: Int, pacMan: PacMan) {
     val handler = new HttpHandler[Int](
       gameId,
       _ => (gameId, gameId + 1),
-      (_, id) => if(id == gameId) Some(step) else None,
       (_, id) => if(id == gameId) Some(pacMan) else None
     )
   }

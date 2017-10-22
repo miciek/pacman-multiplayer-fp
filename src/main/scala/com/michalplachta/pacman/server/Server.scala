@@ -10,7 +10,7 @@ object Server {
     val gameId = state.nextGameId // TODO returns improper value when game cannot be started
     val maybeGameState: Option[GameState] = GameEngine.start(Grid.simpleSmall, PacMan(Position(1, 1), East, None), Set.empty)
     val maybeNewState = maybeGameState.map(gameState => state.copy(
-      games = state.games + ServerGame(gameId, currentStep = 0, gameState),
+      games = state.games + ServerGame(gameId, gameState),
       nextGameId = gameId + 1
     ))
     (maybeNewState.getOrElse(state), gameId)
@@ -18,12 +18,6 @@ object Server {
 
   def findServerGame(state: ServerState, gameId: Int): Option[ServerGame] = {
     state.games.find(_.id == gameId)
-  }
-
-  // TODO: use function composition
-  def getCurrentStep(state: ServerState, gameId: Int): Option[Int] = {
-    val game = findServerGame(state, gameId)
-    game.map(_.currentStep)
   }
 
   // TODO: use function composition
@@ -42,8 +36,7 @@ object Server {
     state.copy(
       games = state.games.map { game =>
         game.copy(
-          gameState = GameEngine.movePacMan(game.gameState),
-          currentStep = game.currentStep + 1
+          gameState = GameEngine.movePacMan(game.gameState)
         )
       })
   }

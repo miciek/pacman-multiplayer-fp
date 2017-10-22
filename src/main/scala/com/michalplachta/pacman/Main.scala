@@ -10,7 +10,6 @@ object Main extends App {
   val port = config.getInt("app.port")
   new HttpHandler(ServerState.clean,
                   Server.startNewGame,
-                  Server.getCurrentStep,
                   Server.getPacMan
                  ).startServer(host, port)
 }

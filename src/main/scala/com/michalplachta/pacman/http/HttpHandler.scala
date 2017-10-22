@@ -6,7 +6,6 @@ import com.michalplachta.pacman.game.data.{Grid, PacMan}
 
 class HttpHandler[S](initialState: S,
                      startNewGame: S => (S, Int),
-                     getCurrentStep: (S, Int) => Option[Int],
                      getPacMan: (S, Int) => Option[PacMan]
                     ) extends HttpApp with GridJson {
   private var state: S = initialState
@@ -29,27 +28,26 @@ class HttpHandler[S](initialState: S,
       }
     } ~
     path("games" / IntNumber) { gameId =>
-      pacManStateResponse(gameId) { pacManStateResponse =>
+      pacManFromState(gameId) { pacMan =>
         get {
-          complete(pacManStateResponse)
-        } ~
-        put {
-          entity(as[NewDirectionRequest]) { _ =>
-            complete(StatusCodes.OK)
-          }
+          complete(PacManStateResponse(pacMan))
         }
       } ~
-      complete((StatusCodes.NotFound, s"Game with the id $gameId couldn't be found"))
+      complete((StatusCodes.NotFound, s"Pac-Man state for the game with id $gameId couldn't be found"))
+    } ~
+    path("games" / IntNumber / "direction") { gameId =>
+      put {
+        entity(as[NewDirectionRequest]) { _ =>
+          complete(StatusCodes.OK)
+        }
+      }
     }
 
   protected def routes: Route = route
 
-  private def pacManStateResponse(gameId: Int): Directive1[PacManStateResponse] = {
-    val maybeResponse = for {
-      currentStep <- getCurrentStep(state, gameId)
-      pacMan <- getPacMan(state, gameId)
-    } yield PacManStateResponse(currentStep, pacMan)
-    maybeResponse.map(provide).getOrElse(reject)
+  private def pacManFromState(gameId: Int): Directive1[PacMan] = {
+    val maybePacMan = getPacMan(state, gameId)
+    maybePacMan.map(provide).getOrElse(reject)
   }
 }
 

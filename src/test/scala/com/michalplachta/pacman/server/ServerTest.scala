@@ -18,12 +18,7 @@ class ServerTest extends WordSpec with Matchers {
       firstGameId should not be secondGameId
     }
 
-    "increment step after tick" in new StateWithOneGame(step = 10, PacMan(Position(0, 0), direction = South)) {
-      val newState = Server.tick(state)
-      newState.games.find(_.id == gameId).map(_.currentStep) should contain(11)
-    }
-
-    "allow changing direction of Pac-Man" in new StateWithOneGame(step = 0, PacMan(Position(0, 0), direction = East)) {
+    "allow changing direction of Pac-Man" in new StateWithOneGame(PacMan(Position(0, 0), direction = East)) {
       val stateWithChangedDirection = Server.changeDirection(state, gameId, newDirection = South)
       stateWithChangedDirection.games.size should be(1)
       stateWithChangedDirection.games.head.gameState.pacMan.direction should be (East)
@@ -34,9 +29,9 @@ class ServerTest extends WordSpec with Matchers {
     }
   }
 
-  private class StateWithOneGame(step: Int, pacMan: PacMan) {
+  private class StateWithOneGame(pacMan: PacMan) {
     private val gameState: GameState = GameState(pacMan, Grid.noWalls, Set.empty)
     val gameId = 1
-    val state: ServerState = ServerState(Set.empty, Set(ServerGame(gameId, step, gameState)), nextGameId = gameId + 1)
+    val state: ServerState = ServerState(Set.empty, Set(ServerGame(gameId, gameState)), nextGameId = gameId + 1)
   }
 }
