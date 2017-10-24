@@ -10,6 +10,6 @@ object Main extends App {
   val host = config.getString("app.host")
   val port = config.getInt("app.port")
 
-  val handler = new HttpHandler[ServerState](Map.empty, Server.startNewGame, Server.getPacMan)
+  val handler = new HttpHandler[ServerState](Map.empty, Server.startNewGame, Server.getPacMan, Server.setNewDirection)
   handler.startServer(host, port)
 }

@@ -2,11 +2,12 @@ package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directive1, HttpApp, Route}
-import com.michalplachta.pacman.game.data.{Grid, PacMan}
+import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
 
 class HttpHandler[S](initialState: S,
                      startNewGame: S => (S, Int),
-                     getPacMan: (S, Int) => Option[PacMan]
+                     getPacMan: (S, Int) => Option[PacMan],
+                     changeDirection: (S, Int, Direction) => S
                     ) extends HttpApp with GridJson {
   private var state: S = initialState
 
@@ -37,7 +38,8 @@ class HttpHandler[S](initialState: S,
     } ~
     path("games" / IntNumber / "direction") { gameId =>
       put {
-        entity(as[NewDirectionRequest]) { _ =>
+        entity(as[NewDirectionRequest]) { request =>
+          state = changeDirection(state, gameId, request.newDirection)
           complete(StatusCodes.OK)
         }
       }

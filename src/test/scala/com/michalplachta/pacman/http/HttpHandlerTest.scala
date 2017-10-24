@@ -28,7 +28,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow starting a new game in chosen grid configuration" in new HandlerWithOneGame(gameId = 1, PacMan(Position(1, 1), East)) {
+    "allow starting a new game in chosen grid configuration" in new HandlerWithOneGameState(gameId = 1, PacMan(Position(1, 1), East)) {
       val entity = HttpEntity(`application/json`, """{ "gridName": "simpleSmall" }""")
       Post("/games", entity) ~> handler.route ~> check {
         contentType shouldEqual `application/json`
@@ -51,7 +51,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow getting Pac-Man's state in existing game" in new HandlerWithOneGame(gameId = 1, PacMan(Position(2, 1), East)) {
+    "allow getting Pac-Man's state in existing game" in new HandlerWithOneGameState(gameId = 1, PacMan(Position(2, 1), East)) {
       Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
@@ -75,24 +75,49 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow setting a new direction of Pac-Man" in new HandlerWithOneGame(gameId = 1, PacMan(Position(1, 1), East)) {
+    "allow setting a new direction of Pac-Man" in new HandlerWithDirectionState(Position(0, 0), initialDirection = East) {
       val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
       Put("/games/1/direction", entity) ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.OK
       }
+
+      Get("/games/1") ~> handler.route ~> check {
+        contentType shouldEqual `application/json`
+        val expected =
+          s"""
+             |{
+             |  "pacMan": {
+             |    "position": { "x": 0, "y": 0 },
+             |    "direction": "south"
+             |  }
+             |}
+          """.stripMargin
+
+        responseAs[String] should beJson(expected)
+      }
     }
   }
 
   private trait HandlerWithNoGame {
-    val handler = new HttpHandler[Int](0, s => (s + 1, s + 1), (_, _) => None)
+    val handler = new HttpHandler[Int](0, s => (s + 1, s + 1), (_, _) => None, (s, _, _) => s)
   }
 
-  private class HandlerWithOneGame(gameId: Int, pacMan: PacMan) {
+  private class HandlerWithOneGameState(gameId: Int, pacMan: PacMan) {
     val handler = new HttpHandler[Int](
       gameId,
       _ => (gameId, gameId + 1),
-      (_, id) => if(id == gameId) Some(pacMan) else None
+      (_, id) => if(id == gameId) Some(pacMan) else None,
+      (s, _, _) => s
+    )
+  }
+
+  private class HandlerWithDirectionState(position: Position, initialDirection: Direction) {
+    val handler = new HttpHandler[Direction](
+      initialDirection,
+      _ => (initialDirection, 0),
+      (direction, _) => Some(PacMan(position, direction)),
+      (_, _, newDirection) => newDirection
     )
   }
 
