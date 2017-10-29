@@ -8,7 +8,8 @@ class ServerTest extends WordSpec with Matchers {
   "Server" should {
     "allow starting a new game" in {
       val state = Server.cleanState
-      val (newState, newGameId): (ServerState, Int) = Server.startNewGame(state)
+      val gameStateToAdd = GameState(PacMan(Position(0, 0), East), Grid.simpleSmall, Set.empty)
+      val (newState, newGameId): (ServerState, Int) = Server.addNewGame(state, gameStateToAdd)
       newState.get(newGameId).isDefined shouldEqual true
     }
 

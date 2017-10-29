@@ -1,7 +1,10 @@
 package com.michalplachta.pacman
 
+import com.michalplachta.pacman.game.GameEngine
+import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
 import com.michalplachta.pacman.http.HttpHandler
 import com.michalplachta.pacman.server.Server
+import com.michalplachta.pacman.server.Server.ServerState
 import com.typesafe.config.ConfigFactory
 
 object Main extends App {
@@ -9,6 +12,17 @@ object Main extends App {
   val host = config.getString("app.host")
   val port = config.getInt("app.port")
 
-  val handler = new HttpHandler(Server.cleanState, Server.startNewGame, Server.getPacMan, Server.setNewDirection)
+  val startNewGame: (ServerState, Grid) => (ServerState, Int) = { (state, grid) =>
+    val illegalGameId = -1
+    val maybeNewGame = GameEngine.start(grid, PacMan(Position(1, 1), direction = East), Set.empty)
+    maybeNewGame.map(game => Server.addNewGame(state, game)).getOrElse((state, illegalGameId))
+  }
+
+  val handler = new HttpHandler(
+    Server.cleanState,
+    startNewGame,
+    Server.getPacMan,
+    Server.setNewDirection
+  )
   handler.startServer(host, port)
 }
