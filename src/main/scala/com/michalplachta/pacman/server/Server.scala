@@ -1,5 +1,7 @@
 package com.michalplachta.pacman.server
 
+import java.time.Instant
+
 import com.michalplachta.pacman.game.data._
 
 object Server {
@@ -28,4 +30,6 @@ object Server {
         )
     updatedGame.map(game => state.updated(gameId, game)).getOrElse(state)
   }
+
+  def tick(state: ServerState, currentTime: Instant): ServerState = state
 }
