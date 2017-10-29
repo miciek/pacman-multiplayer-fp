@@ -7,6 +7,8 @@ object Server {
   type ServerState = Map[Int, GameState]
   private val illegalGameId = -1
 
+  val cleanState: ServerState = Map.empty
+
   def startNewGame(state: ServerState): (ServerState, Int) = {
     val gameId = state.size
     val maybeGame = GameEngine.start(Grid.simpleSmall, PacMan(Position(1, 1), East, nextDirection = None))
@@ -19,7 +21,14 @@ object Server {
   }
 
   def setNewDirection(state: ServerState, gameId: Int, newDirection: Direction): ServerState = {
-    val updatedGame: Option[GameState] = state.get(gameId).map(game => game.copy(pacMan = game.pacMan.copy(nextDirection = Some(newDirection))))
+    val updatedGame: Option[GameState] =
+      state
+        .get(gameId)
+        .map(game =>
+          game.copy(
+            pacMan = game.pacMan.copy(nextDirection = Some(newDirection))
+          )
+        )
     updatedGame.map(game => state.updated(gameId, game)).getOrElse(state)
   }
 }

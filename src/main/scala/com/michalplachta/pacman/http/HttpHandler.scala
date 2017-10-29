@@ -7,7 +7,7 @@ import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
 class HttpHandler[S](initialState: S,
                      startNewGame: S => (S, Int),
                      getPacMan: (S, Int) => Option[PacMan],
-                     changeDirection: (S, Int, Direction) => S
+                     setNewDirection: (S, Int, Direction) => S
                     ) extends HttpApp with GridJson {
   private var state: S = initialState
 
@@ -39,7 +39,7 @@ class HttpHandler[S](initialState: S,
     path("games" / IntNumber / "direction") { gameId =>
       put {
         entity(as[NewDirectionRequest]) { request =>
-          state = changeDirection(state, gameId, request.newDirection)
+          state = setNewDirection(state, gameId, request.newDirection)
           complete(StatusCodes.OK)
         }
       }
