@@ -3,8 +3,7 @@ package com.michalplachta.pacman
 import com.michalplachta.pacman.game.GameEngine
 import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
 import com.michalplachta.pacman.http.HttpHandler
-import com.michalplachta.pacman.server.Server
-import com.michalplachta.pacman.server.Server.ServerState
+import com.michalplachta.pacman.server.{Server, ServerState}
 import com.typesafe.config.ConfigFactory
 
 object Main extends App {
@@ -19,7 +18,7 @@ object Main extends App {
   }
 
   val handler = new HttpHandler(
-    Server.cleanState,
+    ServerState.clean,
     startNewGame,
     Server.getPacMan,
     Server.setNewDirection

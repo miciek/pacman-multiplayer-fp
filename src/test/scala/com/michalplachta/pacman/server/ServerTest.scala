@@ -3,7 +3,6 @@ package com.michalplachta.pacman.server
 import java.time.Clock
 
 import com.michalplachta.pacman.game.data._
-import com.michalplachta.pacman.server.Server.ServerState
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
@@ -11,10 +10,10 @@ import scala.concurrent.duration._
 class ServerTest extends WordSpec with Matchers {
   "Server" should {
     "allow starting a new game" in {
-      val state = Server.cleanState
+      val state = ServerState.clean
       val gameStateToAdd = GameState(PacMan(Position(0, 0), East), Grid.simpleSmall, Set.empty)
       val (newState, newGameId): (ServerState, Int) = Server.addNewGame(state, gameStateToAdd)
-      newState.get(newGameId).isDefined shouldEqual true
+      newState.games.get(newGameId).isDefined shouldEqual true
     }
 
     "allow getting Pac-Man state" in new ServerWithOneGame(PacMan(Position(2,2), direction = North)) {
@@ -24,25 +23,32 @@ class ServerTest extends WordSpec with Matchers {
 
     "allow setting Pac-Man direction" in new ServerWithOneGame(PacMan(Position(2,2), direction = North)) {
       val newState = Server.setNewDirection(state, gameId, newDirection = South)
-      newState.get(gameId).flatMap(_.pacMan.nextDirection) should contain(South)
+      newState.games.get(gameId).flatMap(_.pacMan.nextDirection) should contain(South)
     }
 
-    "not change the game state before a defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {
-      import TickInstants._
-      val newState: ServerState = Server.tick(state, currentTime = instantBeforeChange)
+    "not change the game state before the defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {
+      val newState: ServerState = Server.tick(state, currentTime = instantBeforeChange, tickDuration, tickF)
       newState should be(state)
+    }
+
+    "change the game state after the defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {
+      val newState: ServerState = Server.tick(state, currentTime = instantAfterChange, tickDuration, tickF)
+      newState.games.get(gameId).map(_.pacMan) should contain(pacManAfterTick)
     }
   }
 
   class ServerWithOneGame(pacMan: PacMan) {
     val gameId = 3
-    val state = Map(gameId -> GameState(pacMan, Grid.simpleSmall, Set.empty))
-  }
+    val initialTick = Clock.systemDefaultZone().instant()
+    val state = ServerState(Map(gameId -> GameState(pacMan, Grid.simpleSmall, Set.empty)), initialTick)
 
-  object TickInstants {
     val tickDuration = 1.second
-    val initialInstant = Clock.systemUTC().instant()
-    val instantBeforeChange = initialInstant.plusMillis((tickDuration / 2).toMillis)
-    val instantAfterChange = initialInstant.plusMillis((tickDuration * 2).toMillis)
+    val instantBeforeChange = initialTick.plusMillis((tickDuration / 2).toMillis)
+    val instantAfterChange = initialTick.plusMillis((tickDuration * 2).toMillis)
+
+    val pacManAfterTick = pacMan.copy(position = Position(pacMan.position.x + 666, pacMan.position.y + 777))
+    val tickF: GameState => GameState = { game =>
+      game.copy(pacMan = pacManAfterTick)
+    }
   }
 }

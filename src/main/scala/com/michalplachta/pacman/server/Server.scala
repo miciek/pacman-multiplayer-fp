@@ -4,32 +4,37 @@ import java.time.Instant
 
 import com.michalplachta.pacman.game.data._
 
+import scala.concurrent.duration.Duration
+
 object Server {
-  type ServerState = Map[Int, GameState]
-
-  val cleanState: ServerState = Map.empty
-
   def addNewGame(state: ServerState, gameState: GameState): (ServerState, Int) = {
-    val gameId = state.size
-    val newState = state + (gameId -> gameState)
+    val gameId = state.games.size
+    val newState = ServerState(state.games + (gameId -> gameState), state.lastTicked)
     (newState, gameId)
   }
 
   def getPacMan(state: ServerState, gameId: Int): Option[PacMan] = {
-    state.get(gameId).map(_.pacMan)
+    state.games.get(gameId).map(_.pacMan)
   }
 
   def setNewDirection(state: ServerState, gameId: Int, newDirection: Direction): ServerState = {
     val updatedGame: Option[GameState] =
-      state
+      state.games
         .get(gameId)
         .map(game =>
           game.copy(
             pacMan = game.pacMan.copy(nextDirection = Some(newDirection))
           )
         )
-    updatedGame.map(game => state.updated(gameId, game)).getOrElse(state)
+    updatedGame.map(game => ServerState(state.games.updated(gameId, game), state.lastTicked)).getOrElse(state)
   }
 
-  def tick(state: ServerState, currentTime: Instant): ServerState = state
+  def tick(state: ServerState, currentTime: Instant, tickDuration: Duration, f: GameState => GameState): ServerState = {
+    val nextTick = state.lastTicked.plusMillis(tickDuration.toMillis)
+    if(currentTime.isBefore(nextTick)) {
+      state
+    } else {
+      ServerState(state.games.mapValues(f), lastTicked = currentTime)
+    }
+  }
 }
