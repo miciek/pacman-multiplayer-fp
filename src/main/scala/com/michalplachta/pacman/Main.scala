@@ -13,7 +13,7 @@ object Main extends App {
 
   val startNewGame: (ServerState, Grid) => (ServerState, Int) = { (state, grid) =>
     val illegalGameId = -1
-    val maybeNewGame = GameEngine.start(grid, PacMan(Position(1, 1), direction = East), Set.empty)
+    val maybeNewGame = GameEngine.start(grid)
     maybeNewGame.map(game => Server.addNewGame(state, game)).getOrElse((state, illegalGameId))
   }
 

@@ -3,9 +3,9 @@ package com.michalplachta.pacman.game
 import com.michalplachta.pacman.game.data._
 
 object GameEngine {
-  def start(grid: Grid, initialPacMan: PacMan, initialDotCells: Set[Position] = Set.empty): Option[GameState] = {
-    if(isGridValid(grid) && isPositionLegal(grid, initialPacMan.position) && areDotCellsLegal(grid, initialDotCells)) {
-      Some(GameState(initialPacMan, grid, initialDotCells))
+  def start(grid: Grid): Option[GameState] = {
+    if(isGridValid(grid) && isPositionLegal(grid, grid.initialPacMan.position) && areDotCellsLegal(grid, grid.initialDotCells)) {
+      Some(GameState(grid.initialPacMan, grid, grid.initialDotCells))
     } else None
   }
 

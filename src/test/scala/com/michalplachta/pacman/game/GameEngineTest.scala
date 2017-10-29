@@ -7,8 +7,13 @@ class GameEngineTest extends WordSpec with Matchers {
   "Game engine (grid setup)" should {
     "start the game with specified grid and initial Pac-Man position" in {
       val state = GameEngine.start(
-        Grid(width = 1, height = 1, emptyCells = Set(Position(0, 0))),
-        initialPacMan = PacMan(Position(0, 0), direction = West)
+        Grid(
+          width = 1,
+          height = 1,
+          emptyCells = Set(Position(0, 0)),
+          initialPacMan = PacMan(Position(0, 0), direction = West),
+          Set.empty
+        )
       )
 
       state.map(_.pacMan.position) should be(Some(Position(0, 0)))
@@ -16,8 +21,13 @@ class GameEngineTest extends WordSpec with Matchers {
 
     "not start the game with illegal grid" in {
       val state = GameEngine.start(
-        Grid(width = 0, height = 1, emptyCells = Set(Position(0, 0))),
-        initialPacMan = PacMan(Position(0, 0), direction = West)
+        Grid(
+          width = 0,
+          height = 1,
+          emptyCells = Set(Position(0, 0)),
+          initialPacMan = PacMan(Position(0, 0), direction = West),
+          Set.empty
+        )
       )
 
       state should be(None)
@@ -25,8 +35,13 @@ class GameEngineTest extends WordSpec with Matchers {
 
     "not start the game with empty positions outside the grid" in {
       val state = GameEngine.start(
-        Grid(width = 1, height = 3, emptyCells = Set(Position(0, 0), Position(2, 1), Position(-1, -2))),
-        initialPacMan = PacMan(Position(0, 0), direction = West)
+        Grid(
+          width = 1,
+          height = 3,
+          emptyCells = Set(Position(0, 0), Position(2, 1), Position(-1, -2)),
+          initialPacMan = PacMan(Position(0, 0), direction = West),
+          Set.empty
+        )
       )
 
       state should be(None)
@@ -34,8 +49,13 @@ class GameEngineTest extends WordSpec with Matchers {
 
     "not start the game with Pac-Man on illegal position" in {
       val state = GameEngine.start(
-        Grid(width = 2, height = 2, emptyCells = Set(Position(0, 0), Position(0, 1))),
-        initialPacMan = PacMan(Position(1, 1), direction = West)
+        Grid(
+          width = 2,
+          height = 2,
+          emptyCells = Set(Position(0, 0), Position(0, 1)),
+          initialPacMan = PacMan(Position(1, 1), direction = West),
+          Set.empty
+        )
       )
 
       state should be(None)
@@ -126,9 +146,13 @@ class GameEngineTest extends WordSpec with Matchers {
   "Game engine (dots)" should {
     "allow an empty cell to contain a dot inside" in {
       val state = GameEngine.start(
-        Grid(width = 2, height = 2, emptyCells = Set(Position(0, 0))),
-        initialPacMan = PacMan(Position(0, 0), direction = West),
-        initialDotCells = Set(Position(0, 0))
+        Grid(
+          width = 2,
+          height = 2,
+          emptyCells = Set(Position(0, 0)),
+          initialPacMan = PacMan(Position(0, 0), direction = West),
+          initialDotCells = Set(Position(0, 0))
+        )
       )
 
       state.map(_.dotCells) should be(Some(Set(Position(0, 0))))
@@ -136,9 +160,13 @@ class GameEngineTest extends WordSpec with Matchers {
 
     "not allow a cell which is not empty to contain a dot inside" in {
       val state = GameEngine.start(
-        Grid(width = 2, height = 2, emptyCells = Set(Position(0, 0))),
-        initialPacMan = PacMan(Position(0, 0), direction = West),
-        initialDotCells = Set(Position(1, 0))
+        Grid(
+          width = 2,
+          height = 2,
+          emptyCells = Set(Position(0, 0)),
+          initialPacMan = PacMan(Position(0, 0), direction = West),
+          initialDotCells = Set(Position(1, 0))
+        )
       )
 
       state should be(None)
@@ -153,11 +181,11 @@ class GameEngineTest extends WordSpec with Matchers {
 
   trait TwoByTwoEmptyGrid {
     val emptyCells = Set(Position(0, 0), Position(0, 1), Position(1, 0), Position(1, 1))
-    val grid = Grid(width = 2, height = 2, emptyCells)
+    val grid = Grid(width = 2, height = 2, emptyCells, PacMan(Position(0, 0), direction = East), Set.empty)
   }
 
   trait TwoByTwoWithEastWallGrid {
     val emptyCells = Set(Position(0, 0), Position(0, 1), Position(1, 0), Position(1, 1))
-    val grid = Grid(width = 3, height = 2, emptyCells)
+    val grid = Grid(width = 3, height = 2, emptyCells, PacMan(Position(0, 0), direction = East), Set.empty)
   }
 }

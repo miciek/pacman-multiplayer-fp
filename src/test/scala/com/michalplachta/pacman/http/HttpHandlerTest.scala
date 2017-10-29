@@ -19,7 +19,9 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
             |{
             |  "width": 3,
             |  "height": 3,
-            |  "emptyCells": [${c(1, 1)}, ${c(1, 2)}, ${c(2, 1)}, ${c(2, 2)}]
+            |  "emptyCells": [${c(1, 1)}, ${c(1, 2)}, ${c(2, 1)}, ${c(2, 2)}],
+            |  "initialPacMan": { "position": { "x": 1, "y": 1 }, "direction": "east" },
+            |  "initialDotCells": []
             |}
           """.stripMargin
         }
