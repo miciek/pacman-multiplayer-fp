@@ -27,7 +27,7 @@ object GameEngine {
     else gameState
   }
 
-  def rotatePacMan(gameState: GameState, newDirection: Direction): GameState = {
+  def changePacMansDirection(gameState: GameState, newDirection: Direction): GameState = {
     gameState.copy(pacMan = gameState.pacMan.copy(nextDirection = Some(newDirection)))
   }
 

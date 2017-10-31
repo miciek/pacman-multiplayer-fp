@@ -25,6 +25,6 @@ class PacManHttpServer(clock: Clock, tickDuration: Duration) {
     ServerState.clean,
     startNewGame,
     getPacManWithStateUpdate,
-    Server.setNewDirection(_: ServerState, _: Int, _: Direction, GameEngine.rotatePacMan)
+    Server.setNewDirection(_: ServerState, _: Int, _: Direction, GameEngine.changePacMansDirection)
   )
 }
