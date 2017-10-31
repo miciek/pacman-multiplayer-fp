@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 class ServerTest extends WordSpec with Matchers {
   "Server" should {
     "allow starting a new game" in {
-      val state = ServerState.clean[GameState]
+      val state = ServerState.clean[GameState](Clock.systemUTC().instant())
       val gameStateToAdd = GameState(PacMan(Position(0, 0), East), Grid.simpleSmall, Set.empty)
       val (newState, newGameId): (ServerState[GameState], Int) = Server.addNewGame(state, gameStateToAdd)
       newState.games.get(newGameId).isDefined shouldEqual true
@@ -40,12 +40,12 @@ class ServerTest extends WordSpec with Matchers {
 
   class ServerWithOneGame(pacMan: PacMan) {
     val gameId = 3
-    val initialTick = Clock.systemDefaultZone().instant()
-    val state = ServerState(Map(gameId -> GameState(pacMan, Grid.simpleSmall, Set.empty)), initialTick)
+    val startedTime = Clock.systemUTC().instant()
+    val state = ServerState(Map(gameId -> GameState(pacMan, Grid.simpleSmall, Set.empty)), startedTime)
 
     val tickDuration = 1.second
-    val instantBeforeChange = initialTick.plusMillis((tickDuration / 2).toMillis)
-    val instantAfterChange = initialTick.plusMillis((tickDuration * 2).toMillis)
+    val instantBeforeChange = startedTime.plusMillis((tickDuration / 2).toMillis)
+    val instantAfterChange = startedTime.plusMillis((tickDuration * 2).toMillis)
 
     val pacManAfterTick = pacMan.copy(position = Position(pacMan.position.x + 666, pacMan.position.y + 777))
     val tickF: GameState => GameState = { game =>

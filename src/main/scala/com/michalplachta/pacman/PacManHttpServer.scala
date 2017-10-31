@@ -29,7 +29,7 @@ class PacManHttpServer(clock: Clock, tickDuration: Duration) {
   }
 
   val httpHandler = new HttpHandler[ServerState[GameState]](
-    ServerState.clean,
+    ServerState.clean(clock.instant()),
     startNewGame,
     getPacManWithStateUpdate,
     changePacMansDirectionInState
