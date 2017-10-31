@@ -17,13 +17,13 @@ class ServerTest extends WordSpec with Matchers {
     }
 
     "allow getting Pac-Man state" in new ServerWithOneGame(PacMan(Position(2,2), direction = North)) {
-      val maybePacMan = Server.getPacMan(state, gameId)
+      val maybePacMan = Server.getGameFromState(state, gameId).map(_.pacMan)
       maybePacMan should contain(PacMan(Position(2, 2), direction = North))
     }
 
     "allow setting Pac-Man direction" in new ServerWithOneGame(PacMan(Position(2,2), direction = North)) {
       val f: (GameState, Direction) => GameState = { (s, d) => s.copy(pacMan = s.pacMan.copy(direction = d))}
-      val newState = Server.setNewDirection(state, gameId, newDirection = South, f)
+      val newState = Server.updateGameInState(state, gameId, f(_: GameState, South))
       newState.games.get(gameId).map(_.pacMan.direction) should contain(South)
     }
 
