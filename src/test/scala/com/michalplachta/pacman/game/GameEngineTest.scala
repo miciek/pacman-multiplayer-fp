@@ -16,7 +16,7 @@ class GameEngineTest extends WordSpec with Matchers {
         )
       )
 
-      state.map(_.pacMan.position) should be(Some(Position(0, 0)))
+      state.map(_.pacMan.position) should be (Right(Position(0, 0)))
     }
 
     "not start the game with illegal grid" in {
@@ -30,7 +30,7 @@ class GameEngineTest extends WordSpec with Matchers {
         )
       )
 
-      state should be(None)
+      state.isLeft should be(true)
     }
 
     "not start the game with empty positions outside the grid" in {
@@ -44,7 +44,7 @@ class GameEngineTest extends WordSpec with Matchers {
         )
       )
 
-      state should be(None)
+      state.isLeft should be(true)
     }
 
     "not start the game with Pac-Man on illegal position" in {
@@ -58,7 +58,7 @@ class GameEngineTest extends WordSpec with Matchers {
         )
       )
 
-      state should be(None)
+      state.isLeft should be(true)
     }
   }
 
@@ -155,7 +155,7 @@ class GameEngineTest extends WordSpec with Matchers {
         )
       )
 
-      state.map(_.dotCells) should be(Some(Set(Position(0, 0))))
+      state.map(_.dotCells) should be(Right(Set(Position(0, 0))))
     }
 
     "not allow a cell which is not empty to contain a dot inside" in {
@@ -169,7 +169,7 @@ class GameEngineTest extends WordSpec with Matchers {
         )
       )
 
-      state should be(None)
+      state.isLeft should be(true)
     }
 
     "remove a dot from a cell when Pac-Man enters it (eating a dot)" in new TwoByTwoEmptyGrid {

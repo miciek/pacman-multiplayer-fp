@@ -18,4 +18,12 @@ object Grid {
     } yield Position(x, y)).toSet
     Grid(width = 3, height = 3, emptyCells, PacMan(Position(0, 0), direction = South), Set.empty)
   }
+
+  def fromName(gridName: String): Option[Grid] = {
+    gridName match {
+      case "simpleSmall" => Some(simpleSmall)
+      case "noWalls" => Some(noWalls)
+      case _ => None
+    }
+  }
 }

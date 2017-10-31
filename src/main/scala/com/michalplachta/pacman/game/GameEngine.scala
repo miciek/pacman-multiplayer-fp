@@ -3,10 +3,10 @@ package com.michalplachta.pacman.game
 import com.michalplachta.pacman.game.data._
 
 object GameEngine {
-  def start(grid: Grid): Option[GameState] = {
+  def start(grid: Grid): Either[String, GameState] = {
     if(isGridValid(grid) && isPositionLegal(grid, grid.initialPacMan.position) && areDotCellsLegal(grid, grid.initialDotCells)) {
-      Some(GameState(grid.initialPacMan, grid, grid.initialDotCells))
-    } else None
+      Right(GameState(grid.initialPacMan, grid, grid.initialDotCells))
+    } else Left("Grid is not valid")
   }
 
   def movePacMan(gameState: GameState): GameState = {

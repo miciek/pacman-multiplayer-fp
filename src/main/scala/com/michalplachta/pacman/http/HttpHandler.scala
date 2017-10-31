@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.{Directive1, HttpApp, Route}
 import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
 
 class HttpHandler[S](initialState: S,
-                     startNewGame: (S, Grid) => (S, Int),
+                     startNewGame: (S, String) => Either[String, (S, Int)],
                      getPacMan: (S, Int) => (S, Option[PacMan]),
                      setNewDirection: (S, Int, Direction) => S
                     ) extends HttpApp with GridJson {
@@ -18,12 +18,12 @@ class HttpHandler[S](initialState: S,
     path("games") {
       post {
         entity(as[StartGameRequest]) { request =>
-          if (request.gridName == "simpleSmall") {
-            val (newServerState, gameId) = startNewGame(state, Grid.simpleSmall)
-            state = newServerState
-            complete(StartGameResponse(gameId))
-          } else {
-            complete((StatusCodes.NotFound, s"Grid with the name '${request.gridName}' couldn't be found"))
+          startNewGame(state, request.gridName) match {
+            case Right((newServerState, gameId)) =>
+              state = newServerState
+              complete(StartGameResponse(gameId))
+            case Left(errorMessage) =>
+              complete(StatusCodes.NotFound, errorMessage)
           }
         }
       }

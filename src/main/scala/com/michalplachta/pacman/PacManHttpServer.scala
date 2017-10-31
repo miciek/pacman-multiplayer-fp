@@ -10,11 +10,11 @@ import com.michalplachta.pacman.server.{Server, ServerState}
 import scala.concurrent.duration._
 
 class PacManHttpServer(clock: Clock, tickDuration: Duration) {
-  private val startNewGame: (ServerState[GameState], Grid) => (ServerState[GameState], Int) = {
-    (state, grid) =>
-      val illegalGameId = -1
-      val maybeNewGame = GameEngine.start(grid)
-      maybeNewGame.map(game => Server.addNewGame(state, game)).getOrElse((state, illegalGameId))
+  private val startNewGame: (ServerState[GameState], String) => Either[String, (ServerState[GameState], Int)] = {
+    (state, gridName) =>
+      val maybeGrid = Grid.fromName(gridName)
+      val newGameOrError = maybeGrid.map(GameEngine.start).getOrElse(Left(s"Grid with the name $gridName not found"))
+      newGameOrError.map(game => Server.addNewGame(state, game))
   }
 
   private val getPacManWithStateUpdate: (ServerState[GameState], Int) => (ServerState[GameState], Option[PacMan]) = {
