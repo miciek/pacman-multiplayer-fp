@@ -9,7 +9,7 @@ import com.michalplachta.pacman.server.{Server, ServerState}
 
 import scala.concurrent.duration._
 
-class PacManHttpServer {
+class PacManHttpServer(clock: Clock, tickDuration: Duration) {
   private val startNewGame: (ServerState, Grid) => (ServerState, Int) = { (state, grid) =>
     val illegalGameId = -1
     val maybeNewGame = GameEngine.start(grid)
@@ -17,7 +17,7 @@ class PacManHttpServer {
   }
 
   private val getPacManWithStateUpdate: (ServerState, Int) => Option[PacMan] = { (state, gameId) =>
-    val updatedState = Server.tick(state, Clock.systemDefaultZone().instant(), 1.second, GameEngine.movePacMan)
+    val updatedState = Server.tick(state, clock.instant(), tickDuration, GameEngine.movePacMan)
     Server.getPacMan(updatedState, gameId)
   }
 
