@@ -10,9 +10,9 @@ import scala.concurrent.duration._
 class ServerTest extends WordSpec with Matchers {
   "Server" should {
     "allow starting a new game" in {
-      val state = ServerState.clean
+      val state = ServerState.clean[GameState]
       val gameStateToAdd = GameState(PacMan(Position(0, 0), East), Grid.simpleSmall, Set.empty)
-      val (newState, newGameId): (ServerState, Int) = Server.addNewGame(state, gameStateToAdd)
+      val (newState, newGameId): (ServerState[GameState], Int) = Server.addNewGame(state, gameStateToAdd)
       newState.games.get(newGameId).isDefined shouldEqual true
     }
 
@@ -28,12 +28,12 @@ class ServerTest extends WordSpec with Matchers {
     }
 
     "not change the game state before the defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {
-      val newState: ServerState = Server.tick(state, currentTime = instantBeforeChange, tickDuration, tickF)
+      val newState: ServerState[GameState] = Server.tick(state, currentTime = instantBeforeChange, tickDuration, tickF)
       newState should be(state)
     }
 
     "change the game state after the defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {
-      val newState: ServerState = Server.tick(state, currentTime = instantAfterChange, tickDuration, tickF)
+      val newState: ServerState[GameState] = Server.tick(state, currentTime = instantAfterChange, tickDuration, tickF)
       newState.games.get(gameId).map(_.pacMan) should contain(pacManAfterTick)
     }
   }
