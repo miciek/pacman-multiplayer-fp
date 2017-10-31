@@ -102,14 +102,14 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   }
 
   private trait HandlerWithNoGame {
-    val handler = new HttpHandler[Int](0, (s, _) => (s + 1, s + 1), (_, _) => None, (s, _, _) => s)
+    val handler = new HttpHandler[Int](0, (s, _) => (s + 1, s + 1), (s, _) => (s, None), (s, _, _) => s)
   }
 
   private class HandlerWithOneGameState(gameId: Int, pacMan: PacMan) {
     val handler = new HttpHandler[Int](
       gameId,
       (_, _) => (gameId, gameId + 1),
-      (_, id) => if(id == gameId) Some(pacMan) else None,
+      (s, id) => if(id == gameId) (s, Some(pacMan)) else (s, None),
       (s, _, _) => s
     )
   }
@@ -118,7 +118,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     val handler = new HttpHandler[Direction](
       initialDirection,
       (_, _) => (initialDirection, 0),
-      (direction, _) => Some(PacMan(position, direction)),
+      (direction, _) => (direction, Some(PacMan(position, direction))),
       (_, _, newDirection) => newDirection
     )
   }

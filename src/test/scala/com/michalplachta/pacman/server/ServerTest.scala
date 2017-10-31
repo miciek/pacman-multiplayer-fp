@@ -22,8 +22,9 @@ class ServerTest extends WordSpec with Matchers {
     }
 
     "allow setting Pac-Man direction" in new ServerWithOneGame(PacMan(Position(2,2), direction = North)) {
-      val newState = Server.setNewDirection(state, gameId, newDirection = South)
-      newState.games.get(gameId).flatMap(_.pacMan.nextDirection) should contain(South)
+      val f: (GameState, Direction) => GameState = { (s, d) => s.copy(pacMan = s.pacMan.copy(direction = d))}
+      val newState = Server.setNewDirection(state, gameId, newDirection = South, f)
+      newState.games.get(gameId).map(_.pacMan.direction) should contain(South)
     }
 
     "not change the game state before the defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {

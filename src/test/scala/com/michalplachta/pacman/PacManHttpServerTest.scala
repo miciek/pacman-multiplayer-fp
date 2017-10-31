@@ -52,6 +52,17 @@ class PacManHttpServerTest extends WordSpec with Matchers with ScalatestRouteTes
           responseAs[PacManStateResponse]
         }).pacMan
       pacManAfterDirectionChange.nextDirection should not equal pacManAfterTick.nextDirection
+
+      When("second tick duration passes")
+      Thread.sleep(tickDuration.toMillis)
+
+      Then("Pac-Man direction changes")
+      val pacManAfterSecondTick: PacMan =
+        (Get(s"/games/$gameId") ~> handler.route ~> check {
+          responseAs[PacManStateResponse]
+        }).pacMan
+
+      pacManAfterSecondTick.direction should be(newDirectionRequest.newDirection)
     }
   }
 }

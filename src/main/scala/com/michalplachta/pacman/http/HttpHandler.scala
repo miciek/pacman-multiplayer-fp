@@ -6,7 +6,7 @@ import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
 
 class HttpHandler[S](initialState: S,
                      startNewGame: (S, Grid) => (S, Int),
-                     getPacMan: (S, Int) => Option[PacMan],
+                     getPacMan: (S, Int) => (S, Option[PacMan]),
                      setNewDirection: (S, Int, Direction) => S
                     ) extends HttpApp with GridJson {
   private var state: S = initialState
@@ -48,7 +48,8 @@ class HttpHandler[S](initialState: S,
   protected def routes: Route = route
 
   private def pacManFromState(gameId: Int): Directive1[PacMan] = {
-    val maybePacMan = getPacMan(state, gameId)
+    val (newState, maybePacMan) = getPacMan(state, gameId)
+    state = newState
     maybePacMan.map(provide).getOrElse(reject)
   }
 }

@@ -17,15 +17,8 @@ object Server {
     state.games.get(gameId).map(_.pacMan)
   }
 
-  def setNewDirection(state: ServerState, gameId: Int, newDirection: Direction): ServerState = {
-    val updatedGame: Option[GameState] =
-      state.games
-        .get(gameId)
-        .map(game =>
-          game.copy(
-            pacMan = game.pacMan.copy(nextDirection = Some(newDirection))
-          )
-        )
+  def setNewDirection(state: ServerState, gameId: Int, newDirection: Direction, f: (GameState, Direction) => GameState): ServerState = {
+    val updatedGame: Option[GameState] = state.games.get(gameId).map(f(_, newDirection))
     updatedGame.map(game => ServerState(state.games.updated(gameId, game), state.lastTicked)).getOrElse(state)
   }
 
