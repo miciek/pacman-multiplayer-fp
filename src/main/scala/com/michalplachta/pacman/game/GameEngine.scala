@@ -1,6 +1,7 @@
 package com.michalplachta.pacman.game
 
 import com.michalplachta.pacman.game.data._
+import monocle.macros.syntax.lens._
 
 object GameEngine {
   def start(grid: Grid): Either[String, GameState] = {
@@ -28,7 +29,7 @@ object GameEngine {
   }
 
   def changePacMansDirection(gameState: GameState, newDirection: Direction): GameState = {
-    gameState.copy(pacMan = gameState.pacMan.copy(nextDirection = Some(newDirection)))
+    gameState.lens(_.pacMan.nextDirection).set(Some(newDirection))
   }
 
   def isGridValid(grid: Grid): Boolean = {
