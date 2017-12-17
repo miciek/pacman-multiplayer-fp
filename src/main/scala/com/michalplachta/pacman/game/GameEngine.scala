@@ -5,7 +5,7 @@ import monocle.macros.syntax.lens._
 
 object GameEngine {
   def start(grid: Grid): Either[String, GameState] = {
-    if(isGridValid(grid) && isPositionLegal(grid, grid.initialPacMan.position) && areDotCellsLegal(grid, grid.initialDotCells)) {
+    if(isGridValid(grid)) {
       Right(GameState(grid.initialPacMan, grid, grid.initialDotCells))
     } else Left("Grid is not valid")
   }
@@ -32,7 +32,17 @@ object GameEngine {
     gameState.lens(_.pacMan.nextDirection).set(Some(newDirection))
   }
 
+  def moveAndWrap(position: Position, grid: Grid, dx: Int, dy: Int): Position = {
+    Position((position.x + dx + grid.width) % grid.width, (position.y + dy + grid.height) % grid.height)
+  }
+
   def isGridValid(grid: Grid): Boolean = {
+    isGridSizeValid(grid) &&
+    isPositionLegal(grid, grid.initialPacMan.position) &&
+    areDotCellsLegal(grid, grid.initialDotCells)
+  }
+
+  def isGridSizeValid(grid: Grid): Boolean = {
     grid.width > 0 && grid.height > 0 && grid.emptyCells.forall(cell => cell.x < grid.width && cell.y < grid.height)
   }
 
@@ -42,9 +52,5 @@ object GameEngine {
 
   def areDotCellsLegal(grid: Grid, dotCells: Set[Position]): Boolean = {
     dotCells.forall(dotCell => grid.emptyCells.contains(dotCell))
-  }
-
-  def moveAndWrap(position: Position, grid: Grid, dx: Int, dy: Int): Position = {
-    Position((position.x + dx + grid.width) % grid.width, (position.y + dy + grid.height) % grid.height)
   }
 }
