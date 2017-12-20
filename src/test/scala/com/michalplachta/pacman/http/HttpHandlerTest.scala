@@ -12,7 +12,7 @@ import spray.json._
 
 class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   "HTTP Handler" should {
-    "allow getting a particular grid configuration" in new MockedHandler() {
+    "allow getting a particular grid configuration" in new TestScope() {
       Get("/grids/simpleSmall") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected = {
@@ -32,7 +32,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow starting a new game in chosen grid configuration" in new MockedHandler() {
+    "allow starting a new game in chosen grid configuration" in new TestScope() {
       val entity = HttpEntity(`application/json`, s"""{ "gridName": "$validGridName" }""")
       Post("/games", entity) ~> handler.route ~> check {
         contentType shouldEqual `application/json`
@@ -47,7 +47,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow starting a new game in unknown grid configuration" in new MockedHandler(1 -> PacMan(Position(0, 0), West)) {
+    "not allow starting a new game in unknown grid configuration" in new TestScope(1 -> PacMan(Position(0, 0), West)) {
       val entity = HttpEntity(`application/json`, """{ "gridName": "non existing grid configuration" }""")
       Post("/games", entity) ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
@@ -55,7 +55,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow getting Pac-Man's state in existing game" in new MockedHandler(1 -> PacMan(Position(2, 1), East)) {
+    "allow getting Pac-Man's state in existing game" in new TestScope(1 -> PacMan(Position(2, 1), East)) {
       Get("/games/1") ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
@@ -72,14 +72,14 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow getting the Pac-Man state when the game is not found" in new MockedHandler(1 -> PacMan(Position(0, 0), East)) {
+    "not allow getting the Pac-Man state when the game is not found" in new TestScope(1 -> PacMan(Position(0, 0), East)) {
       Get("/games/2") ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.NotFound
       }
     }
 
-    "allow setting a new direction of Pac-Man" in new MockedHandler(1 -> PacMan(Position(0, 0), East)) {
+    "allow setting a new direction of Pac-Man" in new TestScope(1 -> PacMan(Position(0, 0), East)) {
       val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
       Put("/games/1/direction", entity) ~> handler.route ~> check {
         contentType shouldEqual `text/plain(UTF-8)`
@@ -104,7 +104,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
   }
 
-  private class MockedHandler(games: (Int, PacMan)*) {
+  private class TestScope(games: (Int, PacMan)*) {
     final case class FakeGame(id: Int, pacMan: PacMan)
     final case class FakeState(games: List[FakeGame])
 
