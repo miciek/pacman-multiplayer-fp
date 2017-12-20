@@ -2,7 +2,7 @@ package com.michalplachta.pacman.server
 
 import java.time.Clock
 
-import com.michalplachta.pacman.game.data._
+import com.michalplachta.pacman.server.ServerTest.FakeGame
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
@@ -10,46 +10,49 @@ import scala.concurrent.duration._
 class ServerTest extends WordSpec with Matchers {
   "Server" should {
     "allow starting a new game" in {
-      val state = ServerState.clean[GameState](Clock.systemUTC().instant())
-      val gameStateToAdd = GameState(PacMan(Position(0, 0), East), Grid.simpleSmall, Set.empty)
-      val (newState, newGameId): (ServerState[GameState], Int) = Server.addNewGame(state, gameStateToAdd)
-      newState.games.get(newGameId).isDefined shouldEqual true
+      val initialState = ServerState.clean[FakeGame](Clock.systemUTC().instant())
+      val (newState, newGameId) = Server.addNewGame(FakeGame("state")).run(initialState).value
+      newState.games.get(newGameId) should not be empty
     }
 
-    "allow getting Pac-Man state" in new ServerWithOneGame(PacMan(Position(2,2), direction = North)) {
-      val maybePacMan = Server.getGameFromState(state, gameId).map(_.pacMan)
-      maybePacMan should contain(PacMan(Position(2, 2), direction = North))
+    "allow getting game state" in new ServerWithOneGame {
+      val game = Server.getGameFromState(fakeGameId).runA(state).value
+      game should contain(fakeGame)
     }
 
-    "allow setting Pac-Man direction" in new ServerWithOneGame(PacMan(Position(2,2), direction = North)) {
-      val f: (GameState, Direction) => GameState = { (s, d) => s.copy(pacMan = s.pacMan.copy(direction = d))}
-      val newState = Server.updateGameInState(state, gameId, f(_: GameState, South))
-      newState.games.get(gameId).map(_.pacMan.direction) should contain(South)
+    "allow setting updated game state" in new ServerWithOneGame {
+      val newFakeGame = FakeGame("newFakeGame")
+      val newState = Server.updateGameInState(fakeGameId, newFakeGame).runS(state).value
+      newState.games.get(fakeGameId) should contain(newFakeGame)
     }
 
-    "not change the game state before the defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {
-      val newState: ServerState[GameState] = Server.tick(state, currentTime = instantBeforeChange, tickDuration, tickF)
+    "not change the game state before the defined tick duration passes" in new ServerWithOneGame {
+      val newState = Server.tick(currentTime = beforeTick, tickDuration, tickF).runS(state).value
       newState should be(state)
     }
 
-    "change the game state after the defined tick duration passes" in new ServerWithOneGame(PacMan(Position(1, 1), direction = East)) {
-      val newState: ServerState[GameState] = Server.tick(state, currentTime = instantAfterChange, tickDuration, tickF)
-      newState.games.get(gameId).map(_.pacMan) should contain(pacManAfterTick)
+    "change the game state after the defined tick duration passes" in new ServerWithOneGame {
+      val newState = Server.tick(currentTime = afterTick, tickDuration, tickF).runS(state).value
+      newState.games.get(fakeGameId) should contain(fakeGameAfterTick)
     }
   }
 
-  class ServerWithOneGame(pacMan: PacMan) {
-    val gameId = 3
+  trait ServerWithOneGame {
+    val fakeGameId = 3
+    val fakeGame = FakeGame("game3")
+    val fakeGameAfterTick = FakeGame("game3ticked")
+
     val startedTime = Clock.systemUTC().instant()
-    val state = ServerState(Map(gameId -> GameState(pacMan, Grid.simpleSmall, Set.empty)), startedTime)
-
     val tickDuration = 1.second
-    val instantBeforeChange = startedTime.plusMillis((tickDuration / 2).toMillis)
-    val instantAfterChange = startedTime.plusMillis((tickDuration * 2).toMillis)
+    val beforeTick = startedTime.plusMillis((tickDuration / 2).toMillis)
+    val afterTick = startedTime.plusMillis((tickDuration * 2).toMillis)
 
-    val pacManAfterTick = pacMan.copy(position = Position(pacMan.position.x + 666, pacMan.position.y + 777))
-    val tickF: GameState => GameState = { game =>
-      game.copy(pacMan = pacManAfterTick)
-    }
+    val tickF: FakeGame => FakeGame = _ => fakeGameAfterTick
+
+    val state = ServerState(Map(fakeGameId -> fakeGame), startedTime)
   }
+}
+
+object ServerTest {
+  final case class FakeGame(s: String)
 }

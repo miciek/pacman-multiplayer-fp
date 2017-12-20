@@ -2,30 +2,31 @@ package com.michalplachta.pacman.server
 
 import java.time.Instant
 
+import cats.data.State
+
 import scala.concurrent.duration.Duration
 
 object Server {
-  def addNewGame[G](state: ServerState[G], gameState: G): (ServerState[G], Int) = {
+  def addNewGame[G](g: G) = State { state: ServerState[G] =>
     val gameId = state.games.size
-    val newState = ServerState(state.games + (gameId -> gameState), state.lastTicked)
+    val newState = ServerState(state.games + (gameId -> g), state.lastTicked)
     (newState, gameId)
   }
 
-  def getGameFromState[G](state: ServerState[G], gameId: Int): Option[G] = {
-    state.games.get(gameId)
+  def getGameFromState[G](gameId: Int) = State { state: ServerState[G] =>
+    (state, state.games.get(gameId))
   }
 
-  def updateGameInState[G](state: ServerState[G], gameId: Int, f: G => G): ServerState[G] = {
-    val updatedGame: Option[G] = state.games.get(gameId).map(f)
-    updatedGame.map(game => ServerState(state.games.updated(gameId, game), state.lastTicked)).getOrElse(state)
+  def updateGameInState[G](gameId: Int, g: G) = State { state: ServerState[G] =>
+    (ServerState(state.games.updated(gameId, g), state.lastTicked), ())
   }
 
-  def tick[G](state: ServerState[G], currentTime: Instant, tickDuration: Duration, f: G => G): ServerState[G] = {
+  def tick[G](currentTime: Instant, tickDuration: Duration, tickF: G => G) = State { state: ServerState[G] =>
     val nextTick = state.lastTicked.plusMillis(tickDuration.toMillis)
     if(currentTime.isBefore(nextTick)) {
-      state
+      (state, ())
     } else {
-      ServerState(state.games.mapValues(f), lastTicked = currentTime)
+      (ServerState(state.games.mapValues(tickF), lastTicked = currentTime), ())
     }
   }
 }

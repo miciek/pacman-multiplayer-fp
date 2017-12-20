@@ -4,9 +4,11 @@ import com.michalplachta.pacman.game.data._
 import org.scalatest.{Matchers, WordSpec}
 
 class GameEngineTest extends WordSpec with Matchers {
+  def start(grid: Grid) = GameEngine.start("testGrid", _ => Some(grid))
+
   "Game engine (grid setup)" should {
     "start the game with specified grid and initial Pac-Man position" in {
-      val state = GameEngine.start(
+      val state = start(
         Grid(
           width = 1,
           height = 1,
@@ -20,7 +22,7 @@ class GameEngineTest extends WordSpec with Matchers {
     }
 
     "not start the game with illegal grid" in {
-      val state = GameEngine.start(
+      val state = start(
         Grid(
           width = 0,
           height = 1,
@@ -34,7 +36,7 @@ class GameEngineTest extends WordSpec with Matchers {
     }
 
     "not start the game with empty positions outside the grid" in {
-      val state = GameEngine.start(
+      val state = start(
         Grid(
           width = 1,
           height = 3,
@@ -48,7 +50,7 @@ class GameEngineTest extends WordSpec with Matchers {
     }
 
     "not start the game with Pac-Man on illegal position" in {
-      val state = GameEngine.start(
+      val state = start(
         Grid(
           width = 2,
           height = 2,
@@ -145,7 +147,7 @@ class GameEngineTest extends WordSpec with Matchers {
 
   "Game engine (dots)" should {
     "allow an empty cell to contain a dot inside" in {
-      val state = GameEngine.start(
+      val state = start(
         Grid(
           width = 2,
           height = 2,
@@ -159,7 +161,7 @@ class GameEngineTest extends WordSpec with Matchers {
     }
 
     "not allow a cell which is not empty to contain a dot inside" in {
-      val state = GameEngine.start(
+      val state = start(
         Grid(
           width = 2,
           height = 2,

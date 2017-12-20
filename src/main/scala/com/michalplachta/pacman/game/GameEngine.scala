@@ -4,10 +4,12 @@ import com.michalplachta.pacman.game.data._
 import monocle.macros.syntax.lens._
 
 object GameEngine {
-  def start(grid: Grid): Either[String, GameState] = {
-    if(isGridValid(grid)) {
-      Right(GameState(grid.initialPacMan, grid, grid.initialDotCells))
-    } else Left("Grid is not valid")
+  def start(gridName: String, gridFactory: String => Option[Grid]): Either[String, GameState] = {
+    gridFactory(gridName).map { grid =>
+      if (isGridValid(grid)) {
+        Right(GameState(grid.initialPacMan, grid, grid.initialDotCells))
+      } else Left("Grid is not valid")
+    }.getOrElse(Left(s"Grid with name $gridName couldn't be found"))
   }
 
   def movePacMan(gameState: GameState): GameState = {
