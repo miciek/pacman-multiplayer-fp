@@ -32,8 +32,8 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow starting a new game in chosen grid configuration" in new MockedHandler(1 -> PacMan(Position(1, 1), East)) {
-      val entity = HttpEntity(`application/json`, s"""{ "gridName": "${validGridName}" }""")
+    "allow starting a new game in chosen grid configuration" in new MockedHandler() {
+      val entity = HttpEntity(`application/json`, s"""{ "gridName": "$validGridName" }""")
       Post("/games", entity) ~> handler.route ~> check {
         contentType shouldEqual `application/json`
         val expected =
