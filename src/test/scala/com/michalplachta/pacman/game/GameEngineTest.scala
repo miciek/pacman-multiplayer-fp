@@ -21,20 +21,6 @@ class GameEngineTest extends WordSpec with Matchers {
       state.map(_.pacMan.position) should be (Right(Position(0, 0)))
     }
 
-    "not start the game with illegal grid" in {
-      val state = start(
-        Grid(
-          width = 0,
-          height = 1,
-          emptyCells = Set(Position(0, 0)),
-          initialPacMan = PacMan(Position(0, 0), direction = West),
-          Set.empty
-        )
-      )
-
-      state.isLeft should be(true)
-    }
-
     "not start the game with empty positions outside the grid" in {
       val state = start(
         Grid(

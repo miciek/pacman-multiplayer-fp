@@ -22,7 +22,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
             |  "width": 3,
             |  "height": 3,
             |  "emptyCells": [${c(1, 1)}, ${c(1, 2)}, ${c(2, 1)}, ${c(2, 2)}],
-            |  "initialPacMan": { "position": { "x": 1, "y": 1 }, "direction": "east" },
+            |  "initialPacMan": { "position": { "x": 1, "y": 1 }, "direction": "east", "nextDirection": null },
             |  "initialDotCells": []
             |}
           """.stripMargin
@@ -50,7 +50,6 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     "not allow starting a new game in unknown grid configuration" in new TestScope(1 -> PacMan(Position(0, 0), West)) {
       val entity = HttpEntity(`application/json`, """{ "gridName": "non existing grid configuration" }""")
       Post("/games", entity) ~> handler.route ~> check {
-        contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.NotFound
       }
     }
@@ -63,7 +62,8 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
              |{
              |  "pacMan": {
              |    "position": { "x": 2, "y": 1 },
-             |    "direction": "east"
+             |    "direction": "east",
+             |    "nextDirection": null
              |  }
              |}
           """.stripMargin
@@ -74,7 +74,6 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
 
     "not allow getting the Pac-Man state when the game is not found" in new TestScope(1 -> PacMan(Position(0, 0), East)) {
       Get("/games/2") ~> handler.route ~> check {
-        contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.NotFound
       }
     }
@@ -82,7 +81,6 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     "allow setting a new direction of Pac-Man" in new TestScope(1 -> PacMan(Position(0, 0), East)) {
       val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
       Put("/games/1/direction", entity) ~> handler.route ~> check {
-        contentType shouldEqual `text/plain(UTF-8)`
         status shouldEqual StatusCodes.OK
       }
 
@@ -93,7 +91,8 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
              |{
              |  "pacMan": {
              |    "position": { "x": 0, "y": 0 },
-             |    "direction": "south"
+             |    "direction": "south",
+             |    "nextDirection": null
              |  }
              |}
           """.stripMargin

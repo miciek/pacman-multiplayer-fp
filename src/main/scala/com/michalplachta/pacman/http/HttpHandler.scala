@@ -4,6 +4,9 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directive1, HttpApp, Route}
 import cats.data.State
 import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
+import DirectionAsJson._
 
 class HttpHandler[S, G](initialState: S,
                         startNewGame: String => Either[String, G],
@@ -13,7 +16,7 @@ class HttpHandler[S, G](initialState: S,
                         getPacMan: G => PacMan,
                         setDirection: Direction => G => G,
                         tick: S => S
-                       ) extends HttpApp with GridJson {
+                       ) extends HttpApp {
   private var state: S = initialState
 
   val route: Route =
@@ -30,7 +33,7 @@ class HttpHandler[S, G](initialState: S,
               state = newState
               complete(StartGameResponse(gameId))
             case Left(errorMessage) =>
-              complete(StatusCodes.NotFound, errorMessage)
+              complete((StatusCodes.NotFound, errorMessage))
           }
         }
       }

@@ -8,6 +8,10 @@ import com.michalplachta.pacman.game.data._
 import com.michalplachta.pacman.http.{NewDirectionRequest, PacManStateResponse, StartGameRequest, StartGameResponse}
 import org.scalatest.{GivenWhenThen, Matchers, WordSpec}
 
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
+import com.michalplachta.pacman.http.DirectionAsJson._
+
 import scala.concurrent.duration._
 
 class PacManHttpServerTest extends WordSpec with Matchers with ScalatestRouteTest with GivenWhenThen {
