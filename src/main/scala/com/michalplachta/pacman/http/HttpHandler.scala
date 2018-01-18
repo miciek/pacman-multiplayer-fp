@@ -6,6 +6,7 @@ import cats.data.State
 import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
+import io.circe.refined._
 import DirectionAsJson._
 
 class HttpHandler[S, G](initialState: S,

@@ -1,6 +1,10 @@
 package com.michalplachta.pacman.game.data
 
-case class Grid(width: Int, height: Int, emptyCells: Set[Position], initialPacMan: PacMan, initialDotCells: Set[Position])
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.auto._
+
+case class Grid(width: Int Refined Positive, height: Int Refined Positive, emptyCells: Set[Position], initialPacMan: PacMan, initialDotCells: Set[Position])
 
 object Grid {
   val simpleSmall = {

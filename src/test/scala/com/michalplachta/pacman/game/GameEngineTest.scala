@@ -2,6 +2,7 @@ package com.michalplachta.pacman.game
 
 import com.michalplachta.pacman.game.data._
 import org.scalatest.{Matchers, WordSpec}
+import eu.timepit.refined.auto._
 
 class GameEngineTest extends WordSpec with Matchers {
   def start(grid: Grid) = GameEngine.start("testGrid", _ => Some(grid))

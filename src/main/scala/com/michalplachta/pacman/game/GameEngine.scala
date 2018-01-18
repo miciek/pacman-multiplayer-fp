@@ -2,6 +2,7 @@ package com.michalplachta.pacman.game
 
 import com.michalplachta.pacman.game.data._
 import monocle.macros.syntax.lens._
+import eu.timepit.refined.auto._
 
 object GameEngine {
   def start(gridName: String, gridFactory: String => Option[Grid]): Either[String, GameState] = {
