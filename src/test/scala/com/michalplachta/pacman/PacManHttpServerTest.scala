@@ -50,14 +50,7 @@ class PacManHttpServerTest extends WordSpec with Matchers with ScalatestRouteTes
         status shouldEqual StatusCodes.OK
       }
 
-      Then("Pac-Man next direction changes")
-      val pacManAfterDirectionChange: PacMan =
-        (Get(s"/games/$gameId") ~> handler.route ~> check {
-          responseAs[PacManStateResponse]
-        }).pacMan
-      pacManAfterDirectionChange.nextDirection should not equal pacManAfterTick.nextDirection
-
-      When("second tick duration passes")
+      And("second tick duration passes")
       Thread.sleep(tickDuration.toMillis)
 
       Then("Pac-Man direction changes")

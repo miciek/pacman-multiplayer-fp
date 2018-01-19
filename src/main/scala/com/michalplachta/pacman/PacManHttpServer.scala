@@ -18,7 +18,7 @@ class PacManHttpServer(clock: Clock, tickDuration: Duration) {
     Server.getGameFromState,
     Server.updateGameInState,
     _.pacMan,
-    direction => gameState => gameState.lens(_.pacMan.nextDirection).set(Some(direction)),
+    direction => gameState => gameState.lens(_.nextPacManDirection).set(Some(direction)),
     serverState => Server.tick(clock.instant(), tickDuration, GameEngine.movePacMan).runS(serverState).value
   )
 }

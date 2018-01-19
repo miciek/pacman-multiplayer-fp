@@ -22,7 +22,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
             |  "width": 3,
             |  "height": 3,
             |  "emptyCells": [${c(1, 1)}, ${c(1, 2)}, ${c(2, 1)}, ${c(2, 2)}],
-            |  "initialPacMan": { "position": { "x": 1, "y": 1 }, "direction": "east", "nextDirection": null },
+            |  "initialPacMan": { "position": { "x": 1, "y": 1 }, "direction": "east" },
             |  "initialDotCells": []
             |}
           """.stripMargin
@@ -62,8 +62,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
              |{
              |  "pacMan": {
              |    "position": { "x": 2, "y": 1 },
-             |    "direction": "east",
-             |    "nextDirection": null
+             |    "direction": "east"
              |  }
              |}
           """.stripMargin
@@ -91,8 +90,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
              |{
              |  "pacMan": {
              |    "position": { "x": 0, "y": 0 },
-             |    "direction": "south",
-             |    "nextDirection": null
+             |    "direction": "south"
              |  }
              |}
           """.stripMargin

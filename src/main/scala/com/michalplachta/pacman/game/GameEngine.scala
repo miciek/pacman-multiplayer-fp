@@ -8,14 +8,14 @@ object GameEngine {
   def start(gridName: String, gridFactory: String => Option[Grid]): Either[String, GameState] = {
     gridFactory(gridName).map { grid =>
       if (isGridValid(grid)) {
-        Right(GameState(grid.initialPacMan, grid, grid.initialDotCells))
+        Right(GameState(grid.initialPacMan, None, grid, grid.initialDotCells))
       } else Left("Grid is not valid")
     }.getOrElse(Left(s"Grid with name $gridName couldn't be found"))
   }
 
   def movePacMan(gameState: GameState): GameState = {
     val oldPosition = gameState.pacMan.position
-    val newDirection = gameState.pacMan.nextDirection.getOrElse(gameState.pacMan.direction)
+    val newDirection = gameState.nextPacManDirection.getOrElse(gameState.pacMan.direction)
     val newPosition = newDirection match {
       case West => moveAndWrap(oldPosition, gameState.grid, dx = -1, dy = 0)
       case East => moveAndWrap(oldPosition, gameState.grid, dx = 1, dy = 0)
@@ -25,14 +25,15 @@ object GameEngine {
 
     if(isPositionLegal(gameState.grid, newPosition) && newPosition != oldPosition)
       gameState.copy(
-        pacMan = PacMan(newPosition, newDirection, None),
+        pacMan = PacMan(newPosition, newDirection),
+        nextPacManDirection = None,
         dotCells = gameState.dotCells - newPosition
       )
     else gameState
   }
 
   def changePacMansDirection(gameState: GameState, newDirection: Direction): GameState = {
-    gameState.lens(_.pacMan.nextDirection).set(Some(newDirection))
+    gameState.lens(_.nextPacManDirection).set(Some(newDirection))
   }
 
   def moveAndWrap(position: Position, grid: Grid, dx: Int, dy: Int): Position = {
