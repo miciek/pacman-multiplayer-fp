@@ -11,7 +11,7 @@ object Main extends App {
   val port = config.getInt("app.port")
   val tickDuration = Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
-  val server = new StatefulHttpServer(tickDuration)
+  val server = new StatefulHttpRoute(tickDuration)
   val httpApp = new HttpApp {
     override protected def routes = server.route
   }
