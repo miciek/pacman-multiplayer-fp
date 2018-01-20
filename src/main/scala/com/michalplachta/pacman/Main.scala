@@ -2,6 +2,7 @@ package com.michalplachta.pacman
 
 import java.time.Clock
 
+import akka.http.scaladsl.server.HttpApp
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
@@ -12,5 +13,9 @@ object Main extends App {
   val port = config.getInt("app.port")
   val tickDuration = Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
-  new PacManHttpServer(Clock.systemDefaultZone(), tickDuration).httpHandler.startServer(host, port)
+  val server = new PacManHttpServer(Clock.systemDefaultZone(), tickDuration)
+  val httpApp = new HttpApp {
+    override protected def routes = server.route
+  }
+  httpApp.startServer(host, port)
 }

@@ -13,7 +13,7 @@ import spray.json._
 class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
   "HTTP Handler" should {
     "allow getting a particular grid configuration" in new TestScope() {
-      Get("/grids/simpleSmall") ~> handler.route ~> check {
+      Get("/grids/simpleSmall") ~> handler.handleGetGrid ~> check {
         contentType shouldEqual `application/json`
         val expected = {
           def c(x: Int, y: Int) = s"""{"x": $x, "y": $y}"""
@@ -33,8 +33,10 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "allow starting a new game in chosen grid configuration" in new TestScope() {
+      val startGameRoute = handler.handleStartGame(startNewGame, addGame)
+
       val entity = HttpEntity(`application/json`, s"""{ "gridName": "$validGridName" }""")
-      Post("/games", entity) ~> handler.route ~> check {
+      Post("/games", entity) ~> startGameRoute ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
@@ -47,15 +49,18 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow starting a new game in unknown grid configuration" in new TestScope(1 -> PacMan(Position(0, 0), West)) {
+    "not allow starting a new game in unknown grid configuration" in new TestScope() {
+      val startGameRoute = handler.handleStartGame(startNewGame, addGame)
+
       val entity = HttpEntity(`application/json`, """{ "gridName": "non existing grid configuration" }""")
-      Post("/games", entity) ~> handler.route ~> check {
+      Post("/games", entity) ~> startGameRoute ~> check {
         status shouldEqual StatusCodes.NotFound
       }
     }
 
     "allow getting Pac-Man's state in existing game" in new TestScope(1 -> PacMan(Position(2, 1), East)) {
-      Get("/games/1") ~> handler.route ~> check {
+      val getGameRoute = handler.handleGetGame(getGameState, getPacMan, identity)
+      Get("/games/1") ~> getGameRoute ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
@@ -72,18 +77,22 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "not allow getting the Pac-Man state when the game is not found" in new TestScope(1 -> PacMan(Position(0, 0), East)) {
-      Get("/games/2") ~> handler.route ~> check {
+      val getGameRoute = handler.handleGetGame(getGameState, getPacMan, identity)
+      Get("/games/2") ~> getGameRoute ~> check {
         status shouldEqual StatusCodes.NotFound
       }
     }
 
     "allow setting a new direction of Pac-Man" in new TestScope(1 -> PacMan(Position(0, 0), East)) {
+      val setDirectionRoute = handler.handleSetDirection(getGameState, setGameState, setDirection)
+      val getGameRoute = handler.handleGetGame(getGameState, getPacMan, identity)
+
       val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
-      Put("/games/1/direction", entity) ~> handler.route ~> check {
+      Put("/games/1/direction", entity) ~> setDirectionRoute ~> check {
         status shouldEqual StatusCodes.OK
       }
 
-      Get("/games/1") ~> handler.route ~> check {
+      Get("/games/1") ~> getGameRoute ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
@@ -109,15 +118,24 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
     val validGridName = "validGridName"
 
     val handler: HttpHandler[FakeState, FakeGame] = new HttpHandler[FakeState, FakeGame](
-      FakeState(games.toList.map({ case (id, pacMan) => FakeGame(id, pacMan) })),
-      gridName => if(gridName == validGridName) Right(newGame) else Left("Not a valid grid name"),
-      g => State(s => (s.copy(games = g :: s.games), g.id)),
-      id => State(s => (s, s.games.find(_.id == id))),
-      (_, g) => State(_ => (FakeState(List(g)), ())),
-      _.pacMan,
-      direction => fakeGame => fakeGame.lens(_.pacMan.direction).set(direction),
-      identity
+      FakeState(games.toList.map({ case (id, pacMan) => FakeGame(id, pacMan) }))
     )
+
+    def startNewGame(gridName: String) =
+      if(gridName == validGridName) Right(newGame) else Left("Not a valid grid name")
+
+    def addGame(game: FakeGame): State[FakeState, Int] =
+      State(s => (s.copy(games = game :: s.games), game.id))
+
+    def getGameState(id: Int): State[FakeState, Option[FakeGame]] =
+      State(s => (s, s.games.find(_.id == id)))
+
+    def getPacMan(game: FakeGame): PacMan = game.pacMan
+
+    def setGameState(id: Int, newGameState: FakeGame): State[FakeState, Unit] =
+      State(_ => (FakeState(List(newGameState)), ()))
+
+    def setDirection(direction: Direction)(fakeGame: FakeGame) = fakeGame.lens(_.pacMan.direction).set(direction)
   }
 
   private def beJson(right: String) = new Matcher[String] {

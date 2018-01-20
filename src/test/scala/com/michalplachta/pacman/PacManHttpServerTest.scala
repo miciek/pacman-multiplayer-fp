@@ -19,18 +19,18 @@ class PacManHttpServerTest extends WordSpec with Matchers with ScalatestRouteTes
     "support the full happy path" in {
       Given("fully configured handler from Pac-Man HTTP Server")
       val tickDuration = 1.second
-      val handler = new PacManHttpServer(Clock.systemDefaultZone(), tickDuration).httpHandler
+      val route = new PacManHttpServer(Clock.systemDefaultZone(), tickDuration).route
 
       When("a new game is started")
       val startGameRequest = StartGameRequest(gridName = "simpleSmall")
       val gameId: Int =
-        (Post("/games", startGameRequest) ~> handler.route ~> check {
+        (Post("/games", startGameRequest) ~> route ~> check {
           responseAs[StartGameResponse]
         }).gameId
 
       Then("Pac-Man state can be retrieved")
       val pacManAfterStart: PacMan =
-        (Get(s"/games/$gameId") ~> handler.route ~> check {
+        (Get(s"/games/$gameId") ~> route ~> check {
           responseAs[PacManStateResponse]
         }).pacMan
 
@@ -39,14 +39,14 @@ class PacManHttpServerTest extends WordSpec with Matchers with ScalatestRouteTes
 
       Then("Pac-Man state changes")
       val pacManAfterTick: PacMan =
-        (Get(s"/games/$gameId") ~> handler.route ~> check {
+        (Get(s"/games/$gameId") ~> route ~> check {
           responseAs[PacManStateResponse]
         }).pacMan
       pacManAfterTick should not equal pacManAfterStart
 
       When("user changes the direction of the Pac-Man")
       val newDirectionRequest = NewDirectionRequest(newDirection = if(pacManAfterStart.direction == West) East else West)
-      Put(s"/games/$gameId/direction", newDirectionRequest) ~> handler.route ~> check {
+      Put(s"/games/$gameId/direction", newDirectionRequest) ~> route ~> check {
         status shouldEqual StatusCodes.OK
       }
 
@@ -55,7 +55,7 @@ class PacManHttpServerTest extends WordSpec with Matchers with ScalatestRouteTes
 
       Then("Pac-Man direction changes")
       val pacManAfterSecondTick: PacMan =
-        (Get(s"/games/$gameId") ~> handler.route ~> check {
+        (Get(s"/games/$gameId") ~> route ~> check {
           responseAs[PacManStateResponse]
         }).pacMan
 

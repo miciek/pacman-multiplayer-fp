@@ -9,6 +9,8 @@ Get some theoretical and practical overview of the TDD approach, Functional Prog
 * Using optics to deal with immutable changing data.
 * Using function composition.
 * Using State monad.
+* Using refined types.
+* Using Akka HTTP + Circe.
 * Separate concerns by using functions as input parameters.
 
 ## Requirements
