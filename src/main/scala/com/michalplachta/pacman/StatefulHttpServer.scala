@@ -1,12 +1,10 @@
 package com.michalplachta.pacman
 
-import java.time.Clock
 import java.util.concurrent.TimeUnit
 
 import akka.http.scaladsl.server.Route
 import com.michalplachta.pacman.game.GameEngine
 import com.michalplachta.pacman.game.data.{Direction, GameState, Grid}
-import com.michalplachta.pacman.server.{Server, ServerState}
 import monocle.macros.syntax.lens._
 import akka.http.scaladsl.server.RouteConcatenation._
 import com.michalplachta.pacman.http.HttpHandlers.{handleCreateGame, handleGetGame, handleGetGrid, handleSetDirection}
@@ -15,23 +13,23 @@ import monix.execution.atomic.Atomic
 
 import scala.concurrent.duration._
 
-class StatefulHttpServer(clock: Clock, tickDuration: Duration) {
-  val atomicState = Atomic(ServerState.clean[GameState](clock.instant()))
+class StatefulHttpServer(tickDuration: Duration) {
+  val atomicState = Atomic(Map.empty[Int, GameState])
 
   def addNewGame(game: GameState): Int = {
     atomicState.transformAndExtract { state =>
-      Server.addNewGame(game).run(state).value.swap
+      val gameId = state.size
+      val newState = state + (gameId -> game)
+      (gameId, newState)
     }
   }
 
   def getGame(gameId: Int): Option[GameState] = {
-    atomicState.get.games.get(gameId)
+    atomicState.get.get(gameId)
   }
 
   def setGame(gameId: Int, game: GameState): Unit = {
-    atomicState.transform { state =>
-      Server.updateGameInState(gameId, game).runS(state).value
-    }
+    atomicState.transform(_.updated(gameId, game))
   }
 
   def setDirection(direction: Direction)(gameState: GameState) =
@@ -40,9 +38,7 @@ class StatefulHttpServer(clock: Clock, tickDuration: Duration) {
   val scheduler = Scheduler.singleThread(name = "tick-games-thread")
   scheduler.scheduleWithFixedDelay(
     0, tickDuration.toMillis, TimeUnit.MILLISECONDS,
-    () => atomicState.transform { state =>
-        Server.tick(clock.instant(), tickDuration, GameEngine.movePacMan).runS(state).value
-    }
+    () => atomicState.transform(_.mapValues(GameEngine.movePacMan))
   )
 
   val route: Route =

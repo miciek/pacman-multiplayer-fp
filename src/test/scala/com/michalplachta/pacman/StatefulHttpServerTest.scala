@@ -1,7 +1,5 @@
 package com.michalplachta.pacman
 
-import java.time.Clock
-
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.michalplachta.pacman.game.data._
@@ -19,7 +17,7 @@ class StatefulHttpServerTest extends WordSpec with Matchers with ScalatestRouteT
     "support the full happy path" in {
       Given("fully configured handler from Pac-Man HTTP Server")
       val tickDuration = 1.second
-      val route = new StatefulHttpServer(Clock.systemDefaultZone(), tickDuration).route
+      val route = new StatefulHttpServer(tickDuration).route
 
       When("a new game is started")
       val startGameRequest = StartGameRequest(gridName = "simpleSmall")

@@ -1,7 +1,5 @@
 package com.michalplachta.pacman
 
-import java.time.Clock
-
 import akka.http.scaladsl.server.HttpApp
 import com.typesafe.config.ConfigFactory
 
@@ -13,7 +11,7 @@ object Main extends App {
   val port = config.getInt("app.port")
   val tickDuration = Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
-  val server = new StatefulHttpServer(Clock.systemDefaultZone(), tickDuration)
+  val server = new StatefulHttpServer(tickDuration)
   val httpApp = new HttpApp {
     override protected def routes = server.route
   }
