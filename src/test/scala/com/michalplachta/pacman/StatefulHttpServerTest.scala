@@ -14,12 +14,12 @@ import com.michalplachta.pacman.http.DirectionAsJson._
 
 import scala.concurrent.duration._
 
-class PacManHttpServerTest extends WordSpec with Matchers with ScalatestRouteTest with GivenWhenThen {
+class StatefulHttpServerTest extends WordSpec with Matchers with ScalatestRouteTest with GivenWhenThen {
   "Pac-Man HTTP Server (integration test)" should {
     "support the full happy path" in {
       Given("fully configured handler from Pac-Man HTTP Server")
       val tickDuration = 1.second
-      val route = new PacManHttpServer(Clock.systemDefaultZone(), tickDuration).route
+      val route = new StatefulHttpServer(Clock.systemDefaultZone(), tickDuration).route
 
       When("a new game is started")
       val startGameRequest = StartGameRequest(gridName = "simpleSmall")

@@ -11,6 +11,7 @@ Get some theoretical and practical overview of the TDD approach, Functional Prog
 * Using State monad.
 * Using refined types.
 * Using Akka HTTP + Circe.
+* Using Monix Atomic to handle state.
 * Separate concerns by using functions as input parameters.
 
 ## Requirements

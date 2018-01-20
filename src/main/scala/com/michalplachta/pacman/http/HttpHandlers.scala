@@ -8,7 +8,7 @@ import io.circe.generic.auto._
 import io.circe.refined._
 import DirectionAsJson._
 
-object HttpHandler extends Directives {
+object HttpHandlers extends Directives {
   val handleGetGrid: Route =
     path("grids" / "simpleSmall") {
       complete(Grid.simpleSmall)

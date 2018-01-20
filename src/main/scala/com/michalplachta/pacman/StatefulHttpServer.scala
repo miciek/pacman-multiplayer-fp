@@ -9,13 +9,13 @@ import com.michalplachta.pacman.game.data.{Direction, GameState, Grid}
 import com.michalplachta.pacman.server.{Server, ServerState}
 import monocle.macros.syntax.lens._
 import akka.http.scaladsl.server.RouteConcatenation._
-import com.michalplachta.pacman.http.HttpHandler.{handleCreateGame, handleGetGame, handleGetGrid, handleSetDirection}
+import com.michalplachta.pacman.http.HttpHandlers.{handleCreateGame, handleGetGame, handleGetGrid, handleSetDirection}
 import monix.execution.Scheduler
 import monix.execution.atomic.Atomic
 
 import scala.concurrent.duration._
 
-class PacManHttpServer(clock: Clock, tickDuration: Duration) {
+class StatefulHttpServer(clock: Clock, tickDuration: Duration) {
   val atomicState = Atomic(ServerState.clean[GameState](clock.instant()))
 
   def addNewGame(game: GameState): Int = {

@@ -13,7 +13,7 @@ object Main extends App {
   val port = config.getInt("app.port")
   val tickDuration = Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
-  val server = new PacManHttpServer(Clock.systemDefaultZone(), tickDuration)
+  val server = new StatefulHttpServer(Clock.systemDefaultZone(), tickDuration)
   val httpApp = new HttpApp {
     override protected def routes = server.route
   }
