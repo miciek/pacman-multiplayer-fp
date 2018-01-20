@@ -13,7 +13,7 @@ libraryDependencies ++= {
   val akkaHttpV = "10.0.10"
   val circeV = "0.8.0"
   val akkaHttpCirceV = "1.18.0"
-  val catsV = "1.0.0-RC1"
+  val monixV = "2.3.0"
   val monocleV = "1.4.0"
   val refinedV = "0.8.5"
   val scalaTestV = "3.0.1"
@@ -23,6 +23,7 @@ libraryDependencies ++= {
     "com.github.julien-truffaut" %%  "monocle-core"  % monocleV,
     "com.github.julien-truffaut" %%  "monocle-macro" % monocleV,
     "eu.timepit" %% "refined" % refinedV,
+    "io.monix" %% "monix-execution" % monixV,
     "io.circe" %% "circe-generic" % circeV,
     "io.circe" %% "circe-refined" % circeV,
     "de.heikoseeberger" %% "akka-http-circe" % akkaHttpCirceV,
