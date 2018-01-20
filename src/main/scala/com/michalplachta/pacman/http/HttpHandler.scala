@@ -17,11 +17,11 @@ class HttpHandler[S, G](initialState: S) extends Directives {
       complete(Grid.simpleSmall)
     }
 
-  def handleStartGame(startNewGame: String => Either[String, G], addNewGame: G => State[S, Int]): Route =
+  def handleCreateGame(createGame: String => Either[String, G], addNewGame: G => State[S, Int]): Route =
     path("games") {
       post {
         entity(as[StartGameRequest]) { request =>
-          val startedGame = startNewGame(request.gridName)
+          val startedGame = createGame(request.gridName)
           startedGame match {
             case Right(game) =>
               val (newState, gameId) = addNewGame(game).run(state).value

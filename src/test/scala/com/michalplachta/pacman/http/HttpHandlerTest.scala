@@ -32,11 +32,11 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow starting a new game in chosen grid configuration" in new TestScope() {
-      val startGameRoute = handler.handleStartGame(startNewGame, addGame)
+    "allow creating a new game in chosen grid configuration" in new TestScope() {
+      val createGameRoute = handler.handleCreateGame(createGame, addGame)
 
       val entity = HttpEntity(`application/json`, s"""{ "gridName": "$validGridName" }""")
-      Post("/games", entity) ~> startGameRoute ~> check {
+      Post("/games", entity) ~> createGameRoute ~> check {
         contentType shouldEqual `application/json`
         val expected =
           s"""
@@ -49,11 +49,11 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow starting a new game in unknown grid configuration" in new TestScope() {
-      val startGameRoute = handler.handleStartGame(startNewGame, addGame)
+    "not allow creating a new game in unknown grid configuration" in new TestScope() {
+      val createGameRoute = handler.handleCreateGame(createGame, addGame)
 
       val entity = HttpEntity(`application/json`, """{ "gridName": "non existing grid configuration" }""")
-      Post("/games", entity) ~> startGameRoute ~> check {
+      Post("/games", entity) ~> createGameRoute ~> check {
         status shouldEqual StatusCodes.NotFound
       }
     }
@@ -121,7 +121,7 @@ class HttpHandlerTest extends WordSpec with Matchers with ScalatestRouteTest {
       FakeState(games.toList.map({ case (id, pacMan) => FakeGame(id, pacMan) }))
     )
 
-    def startNewGame(gridName: String) =
+    def createGame(gridName: String) =
       if(gridName == validGridName) Right(newGame) else Left("Not a valid grid name")
 
     def addGame(game: FakeGame): State[FakeState, Int] =

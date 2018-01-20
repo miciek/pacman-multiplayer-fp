@@ -22,7 +22,7 @@ class PacManHttpServer(clock: Clock, tickDuration: Duration) {
 
   val route: Route =
     httpHandler.handleGetGrid ~
-    httpHandler.handleStartGame(GameEngine.start(_, Grid.fromName), Server.addNewGame) ~
+    httpHandler.handleCreateGame(GameEngine.start(_, Grid.fromName), Server.addNewGame) ~
     httpHandler.handleGetGame(Server.getGameFromState, _.pacMan, tick) ~
     httpHandler.handleSetDirection(Server.getGameFromState, Server.updateGameInState, setDirection)
 }
