@@ -9,6 +9,7 @@ import org.scalatest.{GivenWhenThen, Matchers, WordSpec}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import com.michalplachta.pacman.http.DirectionAsJson._
+import monix.execution.schedulers.TestScheduler
 
 import scala.concurrent.duration._
 
@@ -17,7 +18,8 @@ class StatefulHttpRouteTest extends WordSpec with Matchers with ScalatestRouteTe
     "support the full happy path" in {
       Given("fully configured handler from Pac-Man HTTP Server")
       val tickDuration = 1.second
-      val route = new StatefulHttpRoute(tickDuration).route
+      val scheduler = TestScheduler()
+      val route = new StatefulHttpRoute(scheduler, tickDuration).route
 
       When("a new game is started")
       val startGameRequest = StartGameRequest(gridName = "simpleSmall")
@@ -33,7 +35,7 @@ class StatefulHttpRouteTest extends WordSpec with Matchers with ScalatestRouteTe
         }).pacMan
 
       When("tick duration passes")
-      Thread.sleep(tickDuration.toMillis)
+      scheduler.tick(tickDuration)
 
       Then("Pac-Man state changes")
       val pacManAfterTick: PacMan =
@@ -49,7 +51,7 @@ class StatefulHttpRouteTest extends WordSpec with Matchers with ScalatestRouteTe
       }
 
       And("second tick duration passes")
-      Thread.sleep(tickDuration.toMillis)
+      scheduler.tick(tickDuration)
 
       Then("Pac-Man direction changes")
       val pacManAfterSecondTick: PacMan =

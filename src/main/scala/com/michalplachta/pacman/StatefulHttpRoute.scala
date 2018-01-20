@@ -1,7 +1,5 @@
 package com.michalplachta.pacman
 
-import java.util.concurrent.TimeUnit
-
 import akka.http.scaladsl.server.Route
 import com.michalplachta.pacman.game.GameEngine
 import com.michalplachta.pacman.game.data.{GameState, Grid}
@@ -12,14 +10,12 @@ import monix.execution.Scheduler
 
 import scala.concurrent.duration._
 
-class StatefulHttpRoute(tickDuration: Duration) {
+class StatefulHttpRoute(tickScheduler: Scheduler, tickDuration: FiniteDuration) {
   private val atomicState = new MultipleGamesAtomicState
 
-  private val scheduler = Scheduler.singleThread(name = "tick-games-thread")
-  scheduler.scheduleWithFixedDelay(
-    0, tickDuration.toMillis, TimeUnit.MILLISECONDS,
-    () => atomicState.tickAllGames(GameEngine.movePacMan)
-  )
+  tickScheduler.scheduleWithFixedDelay(0.seconds, tickDuration) {
+    atomicState.tickAllGames(GameEngine.movePacMan)
+  }
 
   val route: Route =
     handleGetGrid ~

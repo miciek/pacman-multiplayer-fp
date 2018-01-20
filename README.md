@@ -8,7 +8,6 @@ Get some theoretical and practical overview of the TDD approach, Functional Prog
 * Making impossible states impossible.
 * Using optics to deal with immutable changing data.
 * Using function composition.
-* Using State monad.
 * Using refined types.
 * Using Akka HTTP + Circe.
 * Using Monix Atomic to handle state.
