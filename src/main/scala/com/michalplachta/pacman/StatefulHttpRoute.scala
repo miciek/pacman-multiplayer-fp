@@ -18,7 +18,7 @@ class StatefulHttpRoute(tickDuration: Duration) {
   private val scheduler = Scheduler.singleThread(name = "tick-games-thread")
   scheduler.scheduleWithFixedDelay(
     0, tickDuration.toMillis, TimeUnit.MILLISECONDS,
-    () => atomicState.tickAllGames()
+    () => atomicState.tickAllGames(GameEngine.movePacMan)
   )
 
   val route: Route =

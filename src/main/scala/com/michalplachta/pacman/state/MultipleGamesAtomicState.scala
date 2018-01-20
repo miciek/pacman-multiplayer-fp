@@ -1,6 +1,5 @@
 package com.michalplachta.pacman.state
 
-import com.michalplachta.pacman.game.GameEngine
 import com.michalplachta.pacman.game.data.{Direction, GameState}
 import monocle.macros.syntax.lens._
 import monix.execution.atomic.Atomic
@@ -24,6 +23,6 @@ class MultipleGamesAtomicState {
   def setDirection(direction: Direction)(gameState: GameState) =
     gameState.lens(_.nextPacManDirection).set(Some(direction))
 
-  def tickAllGames(): Unit =
-    atomicMap.transform(_.mapValues(GameEngine.movePacMan))
+  def tickAllGames(tickF: GameState => GameState): Unit =
+    atomicMap.transform(_.mapValues(tickF))
 }
