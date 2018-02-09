@@ -4,7 +4,7 @@ import akka.http.scaladsl.server.Route
 import com.michalplachta.pacman.game.GameEngine
 import com.michalplachta.pacman.game.data.{GameState, Grid}
 import akka.http.scaladsl.server.RouteConcatenation._
-import com.michalplachta.pacman.http.HttpHandlers.{handleCreateGame, handleGetGame, handleGetGrid, handleSetDirection}
+import com.michalplachta.pacman.http.HttpHandlers.{createGameRoute, getGameRoute, handleGetGrid, setDirectionRoute}
 import com.michalplachta.pacman.state.MultipleGamesAtomicState
 import monix.execution.Scheduler
 
@@ -19,7 +19,7 @@ class StatefulHttpRoute(tickScheduler: Scheduler, tickDuration: FiniteDuration) 
 
   val route: Route =
     handleGetGrid ~
-    handleCreateGame(GameEngine.start(_, Grid.fromName), atomicState.addNewGame) ~
-    handleGetGame[GameState](atomicState.getGame, _.pacMan) ~
-    handleSetDirection(atomicState.getGame, atomicState.setGame, atomicState.setDirection)
+    createGameRoute(GameEngine.start(_, Grid.fromName), atomicState.addNewGame) ~
+    getGameRoute[GameState](atomicState.getGame, _.pacMan) ~
+    setDirectionRoute(atomicState.getGame, atomicState.setGame, atomicState.setDirection)
 }

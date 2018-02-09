@@ -14,7 +14,7 @@ object HttpHandlers extends Directives {
       complete(Grid.simpleSmall)
     }
 
-  def handleCreateGame[G](createGame: String => Either[String, G], addNewGame: G => Int): Route =
+  def createGameRoute[G](createGame: String => Either[String, G], addNewGame: G => Int): Route =
     path("games") {
       post {
         entity(as[StartGameRequest]) { request =>
@@ -30,7 +30,7 @@ object HttpHandlers extends Directives {
       }
     }
 
-  def handleGetGame[G](getGameState: Int => Option[G], getPacMan: G => PacMan): Route =
+  def getGameRoute[G](getGameState: Int => Option[G], getPacMan: G => PacMan): Route =
     path("games" / IntNumber) { gameId =>
       get {
         val maybeGame = getGameState(gameId)
@@ -41,9 +41,9 @@ object HttpHandlers extends Directives {
       }
     }
 
-  def handleSetDirection[G](getGameState: Int => Option[G],
-                            setGameState: (Int, G) => Unit,
-                            setDirection: Direction => G => G): Route =
+  def setDirectionRoute[G](getGameState: Int => Option[G],
+                           setGameState: (Int, G) => Unit,
+                           setDirection: Direction => G => G): Route =
     path("games" / IntNumber / "direction") { gameId =>
       put {
         entity(as[NewDirectionRequest]) { request =>
