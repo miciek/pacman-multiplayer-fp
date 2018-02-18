@@ -4,7 +4,7 @@ import akka.http.scaladsl.server.Route
 import com.michalplachta.pacman.game.GameEngine
 import com.michalplachta.pacman.game.data.{GameState, Grid}
 import akka.http.scaladsl.server.RouteConcatenation._
-import com.michalplachta.pacman.http.HttpHandlers.{createGameRoute, getGameRoute, handleGetGrid, setDirectionRoute}
+import com.michalplachta.pacman.http.HttpRoutes.{createGameRoute, getGameRoute, handleGetGrid, setDirectionRoute}
 import com.michalplachta.pacman.state.MultipleGamesAtomicState
 import monix.execution.Scheduler
 

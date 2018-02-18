@@ -8,7 +8,7 @@ import io.circe.generic.auto._
 import io.circe.refined._
 import DirectionAsJson._
 
-object HttpHandlers extends Directives {
+object HttpRoutes extends Directives {
   val handleGetGrid: Route =
     path("grids" / "simpleSmall") {
       complete(Grid.simpleSmall)
@@ -30,10 +30,10 @@ object HttpHandlers extends Directives {
       }
     }
 
-  def getGameRoute[G](getGameState: Int => Option[G], getPacMan: G => PacMan): Route =
+  def getGameRoute[G](getGame: Int => Option[G], getPacMan: G => PacMan): Route =
     path("games" / IntNumber) { gameId =>
       get {
-        val maybeGame = getGameState(gameId)
+        val maybeGame = getGame(gameId)
         maybeGame match {
           case Some(game) => complete(PacManStateResponse(getPacMan(game)))
           case _ => complete((StatusCodes.NotFound, s"Pac-Man state for the game with id $gameId couldn't be found"))
@@ -41,17 +41,17 @@ object HttpHandlers extends Directives {
       }
     }
 
-  def setDirectionRoute[G](getGameState: Int => Option[G],
-                           setGameState: (Int, G) => Unit,
+  def setDirectionRoute[G](getGame: Int => Option[G],
+                           setGame: (Int, G) => Unit,
                            setDirection: Direction => G => G): Route =
     path("games" / IntNumber / "direction") { gameId =>
       put {
         entity(as[NewDirectionRequest]) { request =>
-          val maybeGame = getGameState(gameId)
+          val maybeGame = getGame(gameId)
           val maybeUpdatedGame = maybeGame.map(setDirection(request.newDirection))
           maybeUpdatedGame match {
             case Some(updatedGame) =>
-              setGameState(gameId, updatedGame)
+              setGame(gameId, updatedGame)
               complete(StatusCodes.OK)
             case _ =>
               complete(StatusCodes.NotFound)
