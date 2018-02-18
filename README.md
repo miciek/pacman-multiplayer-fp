@@ -1,7 +1,7 @@
-# Workshop: TDDing Reliable Web Apps
+# Workshop: TDDing Functional Web Apps
+Get some theoretical and practical overview of the TDD approach & Functional Programming by creating a multiplayer Pac-Man game server.
 
-Get some theoretical and practical overview of the TDD approach, Functional Programming & Reactive Streams by creating a multiplayer Pac-Man game server.
-
+* First steps in Scala and Scalatest.
 * Test Driven Development (baby steps, starting with the game logic and moving towards HTTP).
 * Purely functional approach (separated data and behaviors, no exceptions, ADTs, `Option`s).
 * Modeling using immutable structures.
@@ -14,6 +14,8 @@ Get some theoretical and practical overview of the TDD approach, Functional Prog
 * Separate concerns by using functions as input parameters.
 
 ## Requirements
+- Familiarity with basic Scala syntax (e.g. first 2 weeks of [Functional Programming Principles in Scala](https://www.coursera.org/learn/progfun1) or [Scala Tutorial](https://www.scala-exercises.org/scala_tutorial/terms_and_types))
+- Please bring your laptop with Scala enabled environment. If you have problems setting it up, please [use contact page](http://michalplachta.com/contact/)
 
 ### Grid setup
   * There is a finite grid of cells.
@@ -37,3 +39,6 @@ Get some theoretical and practical overview of the TDD approach, Functional Prog
   
 ### Gameplay
   * Score is a number of eaten dots.
+  
+## Blog posts about this project
+- [Building functional & testable HTTP APIs](http://michalplachta.com/2018/02/19/building-functional-testable-http-apis/)
