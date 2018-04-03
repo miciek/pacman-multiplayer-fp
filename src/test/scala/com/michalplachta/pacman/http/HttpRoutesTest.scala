@@ -11,26 +11,6 @@ import spray.json._
 
 class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
   "HTTP Handlers" should {
-    "allow getting a particular grid configuration" in new TestScope {
-      Get("/grids/simpleSmall") ~> HttpRoutes.handleGetGrid ~> check {
-        contentType shouldEqual `application/json`
-        val expected = {
-          def c(x: Int, y: Int) = s"""{"x": $x, "y": $y}"""
-          s"""
-            |{
-            |  "width": 3,
-            |  "height": 3,
-            |  "emptyCells": [${c(1, 1)}, ${c(1, 2)}, ${c(2, 1)}, ${c(2, 2)}],
-            |  "initialPacMan": { "position": { "x": 1, "y": 1 }, "direction": "east" },
-            |  "initialDotCells": []
-            |}
-          """.stripMargin
-        }
-
-        responseAs[String] should beJson(expected)
-      }
-    }
-
     "allow creating a new game in chosen grid configuration" in new TestScope {
       val createGameRoute = HttpRoutes.createGameRoute(createGame, addGame)
 

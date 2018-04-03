@@ -9,11 +9,6 @@ import io.circe.refined._
 import DirectionAsJson._
 
 object HttpRoutes extends Directives {
-  val handleGetGrid: Route =
-    path("grids" / "simpleSmall") {
-      complete(Grid.simpleSmall)
-    }
-
   def createGameRoute[G](createGame: String => Either[String, G], addNewGame: G => Int): Route =
     path("games") {
       post {

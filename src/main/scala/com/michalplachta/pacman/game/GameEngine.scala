@@ -5,12 +5,10 @@ import monocle.macros.syntax.lens._
 import eu.timepit.refined.auto._
 
 object GameEngine {
-  def start(gridName: String, gridFactory: String => Option[Grid]): Either[String, GameState] = {
-    gridFactory(gridName).map { grid =>
-      if (isGridValid(grid)) {
-        Right(GameState(grid.initialPacMan, None, grid, grid.initialDotCells))
-      } else Left("Grid is not valid")
-    }.getOrElse(Left(s"Grid with name $gridName couldn't be found"))
+  def start(grid: Grid): Either[String, GameState] = {
+    if (isGridValid(grid)) {
+      Right(GameState(grid.initialPacMan, None, grid, grid.initialDotCells))
+    } else Left("Grid is not valid")
   }
 
   def movePacMan(gameState: GameState): GameState = {

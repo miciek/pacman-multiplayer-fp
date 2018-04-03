@@ -4,10 +4,9 @@ organization := "miciek"
 
 version := "1.0"
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.4"
 
 addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
-
 
 libraryDependencies ++= {
   val akkaHttpV = "10.0.10"

@@ -13,13 +13,10 @@ class StatefulHttpRoutes extends Directives {
   private var state = Map.empty[Int, GameState]
 
   val routes: Route =
-    path("grids" / "simpleSmall") {
-      complete(Grid.simpleSmall)
-    } ~
     path("games") {
       post {
         entity(as[StartGameRequest]) { request =>
-          val startedGame = GameEngine.start(request.gridName, Grid.fromName)
+          val startedGame = GameEngine.start(Grid.small)
           startedGame match {
             case Right(game) =>
               val gameId = state.size
