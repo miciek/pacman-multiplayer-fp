@@ -2,7 +2,6 @@ package com.michalplachta.pacman.entangled
 
 import akka.http.scaladsl.server.HttpApp
 import com.typesafe.config.ConfigFactory
-import monix.execution.Scheduler
 
 import scala.concurrent.duration._
 
@@ -16,7 +15,8 @@ object EntangledMain extends App {
   val config = ConfigFactory.load()
   val host = config.getString("app.host")
   val port = config.getInt("app.port")
-  val tickDuration = Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
+  val tickDuration =
+    Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
   val statefulRoutes = new StatefulHttpRoutes
   val httpApp = new HttpApp {

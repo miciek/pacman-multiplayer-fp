@@ -1,12 +1,12 @@
 name := "pacman-multiplayer-fp"
 
 organization := "miciek"
-
 version := "1.0"
-
 scalaVersion := "2.12.4"
 
-addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
+addCompilerPlugin(
+  "org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
+addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
 
 libraryDependencies ++= {
   val akkaHttpV = "10.0.10"
@@ -19,8 +19,8 @@ libraryDependencies ++= {
   Seq(
     "com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
     "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
-    "com.github.julien-truffaut" %%  "monocle-core"  % monocleV,
-    "com.github.julien-truffaut" %%  "monocle-macro" % monocleV,
+    "com.github.julien-truffaut" %% "monocle-core" % monocleV,
+    "com.github.julien-truffaut" %% "monocle-macro" % monocleV,
     "eu.timepit" %% "refined" % refinedV,
     "io.monix" %% "monix-execution" % monixV,
     "io.circe" %% "circe-generic" % circeV,
@@ -31,4 +31,16 @@ libraryDependencies ++= {
   )
 }
 
-fork in run := true
+scalacOptions ++= Seq(
+  "-unchecked",
+  "-Ywarn-unused-import",
+  "-Xfatal-warnings",
+  "-Ypartial-unification",
+  "-language:higherKinds",
+  "-Xlint"
+)
+
+fork := true
+connectInput in run := true
+scalafmtVersion in ThisBuild := "1.3.0"
+scalafmtOnCompile in ThisBuild := true

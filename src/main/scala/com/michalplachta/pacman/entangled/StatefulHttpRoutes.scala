@@ -4,7 +4,12 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import com.michalplachta.pacman.game.GameEngine
 import com.michalplachta.pacman.game.data.{GameState, Grid}
-import com.michalplachta.pacman.http.{NewDirectionRequest, PacManStateResponse, StartGameRequest, StartGameResponse}
+import com.michalplachta.pacman.http.{
+  NewDirectionRequest,
+  PacManStateResponse,
+  StartGameRequest,
+  StartGameResponse
+}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import io.circe.refined._
@@ -28,29 +33,32 @@ class StatefulHttpRoutes extends Directives {
         }
       }
     } ~
-    path("games" / IntNumber) { gameId =>
-      get {
-        val maybeGame = state.get(gameId)
-        maybeGame match {
-          case Some(game) => complete(PacManStateResponse(game.pacMan))
-          case _ => complete((StatusCodes.NotFound, s"Pac-Man state for the game with id $gameId couldn't be found"))
-        }
-      }
-    } ~
-    path("games" / IntNumber / "direction") { gameId =>
-      put {
-        entity(as[NewDirectionRequest]) { request =>
+      path("games" / IntNumber) { gameId =>
+        get {
           val maybeGame = state.get(gameId)
-          val maybeUpdatedGame = maybeGame.map(game => game.copy(nextPacManDirection = Some(request.newDirection)))
-          maybeUpdatedGame match {
-            case Some(updatedGame) =>
-              state = state + (gameId -> updatedGame)
-              complete(StatusCodes.OK)
+          maybeGame match {
+            case Some(game) => complete(PacManStateResponse(game.pacMan))
             case _ =>
-              complete(StatusCodes.NotFound)
+              complete(
+                (StatusCodes.NotFound,
+                 s"Pac-Man state for the game with id $gameId couldn't be found"))
+          }
+        }
+      } ~
+      path("games" / IntNumber / "direction") { gameId =>
+        put {
+          entity(as[NewDirectionRequest]) { request =>
+            val maybeGame = state.get(gameId)
+            val maybeUpdatedGame = maybeGame.map(game =>
+              game.copy(nextPacManDirection = Some(request.newDirection)))
+            maybeUpdatedGame match {
+              case Some(updatedGame) =>
+                state = state + (gameId -> updatedGame)
+                complete(StatusCodes.OK)
+              case _ =>
+                complete(StatusCodes.NotFound)
+            }
           }
         }
       }
-    }
 }
-
