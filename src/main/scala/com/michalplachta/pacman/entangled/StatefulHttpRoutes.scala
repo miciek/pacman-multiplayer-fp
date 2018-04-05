@@ -3,7 +3,8 @@ package com.michalplachta.pacman.entangled
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import com.michalplachta.pacman.game.GameEngine
-import com.michalplachta.pacman.game.data.{GameState, Grid}
+import com.michalplachta.pacman.game.GridRepository.gridByName
+import com.michalplachta.pacman.game.data.GameState
 import com.michalplachta.pacman.http.{
   NewDirectionRequest,
   PacManStateResponse,
@@ -21,7 +22,7 @@ class StatefulHttpRoutes extends Directives {
     path("games") {
       post {
         entity(as[StartGameRequest]) { request =>
-          val startedGame = GameEngine.start(Grid.small)
+          val startedGame = GameEngine.start(gridByName(request.gridName))
           startedGame match {
             case Right(game) =>
               val gameId = state.size

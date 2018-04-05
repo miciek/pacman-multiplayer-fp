@@ -1,8 +1,8 @@
 package com.michalplachta.pacman
 
 import akka.http.scaladsl.server.Route
-import com.michalplachta.pacman.game.GameEngine
-import com.michalplachta.pacman.game.data.{GameState, Grid}
+import com.michalplachta.pacman.game.{GameEngine, GridRepository}
+import com.michalplachta.pacman.game.data.GameState
 import akka.http.scaladsl.server.RouteConcatenation._
 import com.michalplachta.pacman.http.HttpRoutes.{
   createGameRoute,
@@ -23,7 +23,8 @@ class StatefulHttpRoute(tickScheduler: Scheduler,
   }
 
   val route: Route =
-    createGameRoute(_ => GameEngine.start(Grid.small), atomicState.addNewGame) ~
+    createGameRoute(GridRepository.gridByName.andThen(GameEngine.start),
+                    atomicState.addNewGame) ~
       getGameRoute[GameState](atomicState.getGame, _.pacMan) ~
       setDirectionRoute(atomicState.getGame,
                         atomicState.setGame,

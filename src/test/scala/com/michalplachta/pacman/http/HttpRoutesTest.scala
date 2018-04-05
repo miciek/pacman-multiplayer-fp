@@ -30,7 +30,7 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow creating a new game in unknown grid configuration" in new TestScope {
+    "not allow creating a new game in an unknown grid configuration" in new TestScope {
       val createGameRoute = HttpRoutes.createGameRoute(createGame, addGame)
 
       val entity =
@@ -41,7 +41,7 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "allow getting Pac-Man's state in existing game" in new TestScope {
+    "allow getting Pac-Man's state in an existing game" in new TestScope {
       val getGameRoute = HttpRoutes.getGameRoute(
         _ => Some(FakeGame(1, PacMan(Position(2, 1), East))),
         getPacMan)
