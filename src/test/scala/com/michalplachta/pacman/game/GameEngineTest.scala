@@ -11,23 +11,21 @@ class GameEngineTest extends WordSpec with Matchers {
         Grid(
           width = 1,
           height = 1,
-          emptyCells = Set(Position(0, 0)),
-          initialPacMan = PacMan(Position(0, 0), direction = West),
-          Set.empty
+          usableCells = Set(Position(0, 0)),
+          initialPacMan = PacMan(Position(0, 0), direction = West)
         )
       )
 
       state.map(_.pacMan.position) should be(Right(Position(0, 0)))
     }
 
-    "not start the game with empty positions outside the grid" in {
+    "not start the game with usable cell positions outside the grid" in {
       val state = GameEngine.start(
         Grid(
           width = 1,
           height = 3,
-          emptyCells = Set(Position(0, 0), Position(2, 1), Position(-1, -2)),
-          initialPacMan = PacMan(Position(0, 0), direction = West),
-          Set.empty
+          usableCells = Set(Position(0, 0), Position(2, 1), Position(-1, -2)),
+          initialPacMan = PacMan(Position(0, 0), direction = West)
         )
       )
 
@@ -39,9 +37,8 @@ class GameEngineTest extends WordSpec with Matchers {
         Grid(
           width = 2,
           height = 2,
-          emptyCells = Set(Position(0, 0), Position(0, 1)),
-          initialPacMan = PacMan(Position(1, 1), direction = West),
-          Set.empty
+          usableCells = Set(Position(0, 0), Position(0, 1)),
+          initialPacMan = PacMan(Position(1, 1), direction = West)
         )
       )
 
@@ -172,61 +169,31 @@ class GameEngineTest extends WordSpec with Matchers {
   }
 
   "Game engine (dots)" should {
-    "allow an empty cell to contain a dot inside" in {
-      val state = GameEngine.start(
-        Grid(
-          width = 2,
-          height = 2,
-          emptyCells = Set(Position(0, 0)),
-          initialPacMan = PacMan(Position(0, 0), direction = West),
-          initialDotCells = Set(Position(0, 0))
-        )
-      )
-
-      state.map(_.dotCells) should be(Right(Set(Position(0, 0))))
-    }
-
-    "not allow a cell which is not empty to contain a dot inside" in {
-      val state = GameEngine.start(
-        Grid(
-          width = 2,
-          height = 2,
-          emptyCells = Set(Position(0, 0)),
-          initialPacMan = PacMan(Position(0, 0), direction = West),
-          initialDotCells = Set(Position(1, 0))
-        )
-      )
-
-      state.isLeft should be(true)
-    }
-
     "remove a dot from a cell when Pac-Man enters it (eating a dot)" in new TwoByTwoEmptyGrid {
       val initialState = GameState(PacMan(Position(0, 0), direction = East),
                                    None,
                                    grid,
-                                   dotCells = emptyCells)
+                                   dotCells = usableCells)
       val nextState = GameEngine.movePacMan(initialState)
-      nextState.dotCells should be(emptyCells - Position(1, 0))
+      nextState.dotCells should be(usableCells - Position(1, 0))
     }
   }
 
   trait TwoByTwoEmptyGrid {
-    val emptyCells =
+    val usableCells =
       Set(Position(0, 0), Position(0, 1), Position(1, 0), Position(1, 1))
     val grid = Grid(width = 2,
                     height = 2,
-                    emptyCells,
-                    PacMan(Position(0, 0), direction = East),
-                    Set.empty)
+                    usableCells,
+                    PacMan(Position(0, 0), direction = East))
   }
 
   trait TwoByTwoWithEastWallGrid {
-    val emptyCells =
+    val usableCells =
       Set(Position(0, 0), Position(0, 1), Position(1, 0), Position(1, 1))
     val grid = Grid(width = 3,
                     height = 2,
-                    emptyCells,
-                    PacMan(Position(0, 0), direction = East),
-                    Set.empty)
+                    usableCells,
+                    PacMan(Position(0, 0), direction = East))
   }
 }

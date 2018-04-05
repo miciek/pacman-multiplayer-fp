@@ -51,8 +51,8 @@ Get some theoretical and practical overview of the TDD approach & Functional Pro
 
 ### Grid setup
   * There is a finite grid of cells.
-  * Cells are either empty or blocked (a wall).
-  * One of the empty cells can be occupied by Pac-Man.
+  * Cells are either usable or blocked (a wall).
+  * One of the usable cells can be occupied by Pac-Man.
 
 ### Movement
   * Pac-Man has a direction.
@@ -66,7 +66,8 @@ Get some theoretical and practical overview of the TDD approach & Functional Pro
   * Player cannot rotate Pac-Man into a wall.
   
 ### Dots
-  * An empty cell can have a dot inside.
+  * A usable cell can have a dot inside.
+  * Initially all usable cells have dots.
   * Pac-Man eats a dot by going into a cell with dot inside.
   
 ### Gameplay

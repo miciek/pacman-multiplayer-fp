@@ -7,7 +7,7 @@ import eu.timepit.refined.auto._
 object GameEngine {
   def start(grid: Grid): Either[String, GameState] = {
     if (isGridValid(grid)) {
-      Right(GameState(grid.initialPacMan, None, grid, grid.initialDotCells))
+      Right(GameState(grid.initialPacMan, None, grid, grid.usableCells))
     } else Left("Grid is not valid")
   }
 
@@ -46,20 +46,15 @@ object GameEngine {
 
   def isGridValid(grid: Grid): Boolean = {
     isGridSizeValid(grid) &&
-    isPositionLegal(grid, grid.initialPacMan.position) &&
-    areDotCellsLegal(grid, grid.initialDotCells)
+    isPositionLegal(grid, grid.initialPacMan.position)
   }
 
   def isGridSizeValid(grid: Grid): Boolean = {
-    grid.width > 0 && grid.height > 0 && grid.emptyCells.forall(cell =>
+    grid.width > 0 && grid.height > 0 && grid.usableCells.forall(cell =>
       cell.x < grid.width && cell.y < grid.height)
   }
 
   def isPositionLegal(grid: Grid, position: Position): Boolean = {
-    grid.emptyCells.contains(position)
-  }
-
-  def areDotCellsLegal(grid: Grid, dotCells: Set[Position]): Boolean = {
-    dotCells.forall(dotCell => grid.emptyCells.contains(dotCell))
+    grid.usableCells.contains(position)
   }
 }

@@ -5,6 +5,5 @@ import eu.timepit.refined.numeric.Positive
 
 final case class Grid(width: Int Refined Positive,
                       height: Int Refined Positive,
-                      emptyCells: Set[Position],
-                      initialPacMan: PacMan,
-                      initialDotCells: Set[Position])
+                      usableCells: Set[Position],
+                      initialPacMan: PacMan)
