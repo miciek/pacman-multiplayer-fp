@@ -23,15 +23,15 @@ class StatefulHttpRouteTest
     with Matchers
     with ScalatestRouteTest
     with GivenWhenThen {
-  "Pac-Man Stateful HTTP Route" should {
-    "support the full happy path" in {
+  "[integration test] Stateful HTTP Route" should {
+    "support the full happy path" ignore { // TODO #8 read, understand, un-ignore and make green
       Given("fully configured handler from Pac-Man HTTP Server")
       val tickDuration = 1.second
       val scheduler = TestScheduler()
       val route = new StatefulHttpRoute(scheduler, tickDuration).route
 
       When("a new game is started")
-      val startGameRequest = StartGameRequest(gridName = "simpleSmall")
+      val startGameRequest = StartGameRequest(gridName = "small")
       val gameId: Int =
         (Post("/games", startGameRequest) ~> route ~> check {
           responseAs[StartGameResponse]

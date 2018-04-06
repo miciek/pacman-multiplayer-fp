@@ -2,6 +2,7 @@ package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.{HttpEntity, StatusCodes}
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.michalplachta.pacman.game.data._
 import com.michalplachta.pacman.http.HttpRoutesTest.FakeGame
@@ -13,7 +14,7 @@ import spray.json._
 class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
   "HTTP Handlers" should {
     "allow creating a new game in chosen grid configuration" in new TestScope {
-      val createGameRoute = HttpRoutes.createGameRoute(createGame, addGame)
+      val createGameRoute: Route = ??? // LIVE CODING
 
       val entity =
         HttpEntity(`application/json`, s"""{ "gridName": "$validGridName" }""")
@@ -31,7 +32,7 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "not allow creating a new game in an unknown grid configuration" in new TestScope {
-      val createGameRoute = HttpRoutes.createGameRoute(createGame, addGame)
+      val createGameRoute: Route = ??? // LIVE CODING
 
       val entity =
         HttpEntity(`application/json`,
@@ -42,9 +43,7 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "allow getting Pac-Man's state in an existing game" in new TestScope {
-      val getGameRoute = HttpRoutes.getGameRoute(
-        _ => Some(FakeGame(1, PacMan(Position(2, 1), East))),
-        getPacMan)
+      val getGameRoute: Route = ??? // TODO #4
 
       Get("/games/1") ~> getGameRoute ~> check {
         contentType shouldEqual `application/json`
@@ -62,8 +61,8 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow getting the Pac-Man state when the game is not found" in new TestScope {
-      val getGameRoute = HttpRoutes.getGameRoute(_ => None, getPacMan)
+    "not allow getting the Pac-Man's state in an unknown game" in new TestScope {
+      val getGameRoute: Route = ??? // TODO #5
 
       Get("/games/2") ~> getGameRoute ~> check {
         status shouldEqual StatusCodes.NotFound

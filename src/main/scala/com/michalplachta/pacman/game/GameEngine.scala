@@ -1,14 +1,11 @@
 package com.michalplachta.pacman.game
 
 import com.michalplachta.pacman.game.data._
-import monocle.macros.syntax.lens._
-import eu.timepit.refined.auto._
 
 object GameEngine {
   def start(grid: Grid): Either[String, GameState] = {
-    if (isGridValid(grid)) {
-      Right(GameState(grid.initialPacMan, None, grid, grid.usableCells))
-    } else Left("Grid is not valid")
+    // TODO #1
+    ???
   }
 
   def movePacMan(gameState: GameState): GameState = {
@@ -16,10 +13,10 @@ object GameEngine {
     val newDirection =
       gameState.nextPacManDirection.getOrElse(gameState.pacMan.direction)
     val newPosition = newDirection match {
-      case West  => moveAndWrap(oldPosition, gameState.grid, dx = -1, dy = 0)
-      case East  => moveAndWrap(oldPosition, gameState.grid, dx = 1, dy = 0)
-      case North => moveAndWrap(oldPosition, gameState.grid, dx = 0, dy = -1)
-      case South => moveAndWrap(oldPosition, gameState.grid, dx = 0, dy = 1)
+      case West  => oldPosition.copy(x = oldPosition.x - 1)
+      case East  => oldPosition.copy(x = oldPosition.x + 1)
+      case North => oldPosition.copy(y = oldPosition.y - 1)
+      case South => oldPosition.copy(y = oldPosition.y + 1)
     }
 
     if (isPositionLegal(gameState.grid, newPosition) && newPosition != oldPosition)
@@ -33,15 +30,7 @@ object GameEngine {
 
   def changePacMansDirection(gameState: GameState,
                              newDirection: Direction): GameState = {
-    gameState.lens(_.nextPacManDirection).set(Some(newDirection))
-  }
-
-  def moveAndWrap(position: Position,
-                  grid: Grid,
-                  dx: Int,
-                  dy: Int): Position = {
-    Position((position.x + dx + grid.width) % grid.width,
-             (position.y + dy + grid.height) % grid.height)
+    gameState.copy(nextPacManDirection = Some(newDirection))
   }
 
   def isGridValid(grid: Grid): Boolean = {
