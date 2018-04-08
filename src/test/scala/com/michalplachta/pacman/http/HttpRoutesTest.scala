@@ -62,7 +62,7 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
       }
     }
 
-    "not allow getting the Pac-Man state when the game is not found" in new TestScope {
+    "not allow getting the Pac-Man's state in an unknown game" in new TestScope {
       val getGameRoute = HttpRoutes.getGameRoute(_ => None, getPacMan)
 
       Get("/games/2") ~> getGameRoute ~> check {

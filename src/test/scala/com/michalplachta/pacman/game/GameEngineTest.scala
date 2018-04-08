@@ -2,10 +2,9 @@ package com.michalplachta.pacman.game
 
 import com.michalplachta.pacman.game.data._
 import org.scalatest.{Matchers, WordSpec}
-import eu.timepit.refined.auto._
 
 class GameEngineTest extends WordSpec with Matchers {
-  "Game engine (grid setup)" should {
+  "[starting the game] Game engine" should {
     "start the game with specified grid and initial Pac-Man position" in {
       val state = GameEngine.start(
         Grid(
@@ -46,7 +45,7 @@ class GameEngineTest extends WordSpec with Matchers {
     }
   }
 
-  "Game engine (movement)" should {
+  "[movement] Game engine" should {
     "move Pac-Man in east direction" in new TwoByTwoEmptyGrid {
       val initialState = GameState(PacMan(Position(0, 0), direction = East),
                                    None,
@@ -111,7 +110,7 @@ class GameEngineTest extends WordSpec with Matchers {
     }
   }
 
-  "Player" should {
+  "[rotations] Player" should {
     "be able to rotate and move the Pac-Man east" in new TwoByTwoEmptyGrid {
       val initialState = GameState(PacMan(Position(0, 0), direction = South),
                                    None,
@@ -135,25 +134,25 @@ class GameEngineTest extends WordSpec with Matchers {
     }
 
     "be able to rotate and move the Pac-Man north" in new TwoByTwoEmptyGrid {
-      val initialState = GameState(PacMan(Position(1, 0), direction = West),
+      val initialState = GameState(PacMan(Position(1, 1), direction = West),
                                    None,
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
         GameEngine.changePacMansDirection(initialState, North)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
-      nextState.pacMan should be(PacMan(Position(1, 1), direction = North))
+      nextState.pacMan should be(PacMan(Position(1, 0), direction = North))
     }
 
     "be able to rotate and move the Pac-Man south" in new TwoByTwoEmptyGrid {
-      val initialState = GameState(PacMan(Position(1, 1), direction = West),
+      val initialState = GameState(PacMan(Position(1, 0), direction = West),
                                    None,
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
         GameEngine.changePacMansDirection(initialState, South)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
-      nextState.pacMan should be(PacMan(Position(1, 0), direction = South))
+      nextState.pacMan should be(PacMan(Position(1, 1), direction = South))
     }
 
     "not be able to rotate the Pac-Man into a wall" in new TwoByTwoWithEastWallGrid {
@@ -168,7 +167,7 @@ class GameEngineTest extends WordSpec with Matchers {
     }
   }
 
-  "Game engine (dots)" should {
+  "[eating dots] Game engine" should {
     "remove a dot from a cell when Pac-Man enters it (eating a dot)" in new TwoByTwoEmptyGrid {
       val initialState = GameState(PacMan(Position(0, 0), direction = East),
                                    None,

@@ -5,7 +5,6 @@ import akka.http.scaladsl.server.{Directives, Route}
 import com.michalplachta.pacman.game.data.{Direction, PacMan}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
-import io.circe.refined._
 import DirectionAsJson._
 
 object HttpRoutes extends Directives {

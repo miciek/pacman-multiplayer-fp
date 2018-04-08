@@ -1,7 +1,6 @@
 package com.michalplachta.pacman.game
 
 import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
-import eu.timepit.refined.auto._
 
 object GridRepository {
   val smallGrid = {

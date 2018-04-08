@@ -13,9 +13,16 @@ import com.michalplachta.pacman.http.{
 }
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
-import io.circe.refined._
 
-class StatefulHttpRoutes extends Directives {
+/**
+  * WARNING!
+  *
+  * This class demonstrates _WRONG_ approach to building HTTP APIs that
+  * entangles concerns: state is entangled inside HTTP layer.
+  *
+  * See [[com.michalplachta.pacman.http.HttpRoutes]] to see better approach.
+  */
+class EntangledStatefulHttpRoutes extends Directives {
   private var state = Map.empty[Int, GameState]
 
   val routes: Route =
