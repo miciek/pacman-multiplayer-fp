@@ -11,14 +11,20 @@ object GameEngine {
   }
 
   def movePacMan(gameState: GameState): GameState = {
+    def moveAndWrap(position: Position, dx: Int, dy: Int): Position = {
+      val Grid(width, height, _, _) = gameState.grid
+      Position((position.x + dx + width) % width,
+               (position.y + dy + height) % height)
+    }
+
     val oldPosition = gameState.pacMan.position
     val newDirection =
       gameState.nextPacManDirection.getOrElse(gameState.pacMan.direction)
     val newPosition = newDirection match {
-      case West  => moveAndWrap(oldPosition, gameState.grid, dx = -1, dy = 0)
-      case East  => moveAndWrap(oldPosition, gameState.grid, dx = 1, dy = 0)
-      case North => moveAndWrap(oldPosition, gameState.grid, dx = 0, dy = -1)
-      case South => moveAndWrap(oldPosition, gameState.grid, dx = 0, dy = 1)
+      case West  => moveAndWrap(oldPosition, dx = -1, dy = 0)
+      case East  => moveAndWrap(oldPosition, dx = 1, dy = 0)
+      case North => moveAndWrap(oldPosition, dx = 0, dy = -1)
+      case South => moveAndWrap(oldPosition, dx = 0, dy = 1)
     }
 
     if (isPositionLegal(gameState.grid, newPosition) && newPosition != oldPosition)
@@ -33,14 +39,6 @@ object GameEngine {
   def changePacMansDirection(gameState: GameState,
                              newDirection: Direction): GameState = {
     gameState.lens(_.nextPacManDirection).set(Some(newDirection))
-  }
-
-  def moveAndWrap(position: Position,
-                  grid: Grid,
-                  dx: Int,
-                  dy: Int): Position = {
-    Position((position.x + dx + grid.width) % grid.width,
-             (position.y + dy + grid.height) % grid.height)
   }
 
   def isGridValid(grid: Grid): Boolean = {
