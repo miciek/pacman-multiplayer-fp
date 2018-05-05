@@ -4,10 +4,6 @@ organization := "miciek"
 version := "1.0"
 scalaVersion := "2.12.6"
 
-addCompilerPlugin(
-  "org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
-addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.6")
-
 libraryDependencies ++= {
   val akkaHttpV = "10.1.1"
   val circeV = "0.9.3"
@@ -37,7 +33,9 @@ scalacOptions ++= Seq(
   "-Xlint"
 )
 
-fork := true
-connectInput in run := true
+addCompilerPlugin(
+  "org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
+addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.6")
+
 scalafmtVersion in ThisBuild := "1.4.0"
 scalafmtOnCompile in ThisBuild := true
