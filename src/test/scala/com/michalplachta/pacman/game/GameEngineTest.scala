@@ -90,7 +90,9 @@ class GameEngineTest extends WordSpec with Matchers {
       val nextState = GameEngine.movePacMan(initialState)
       nextState.pacMan.position should be(Position(1, 0))
     }
+  }
 
+  "[wrapping] Game engine" should {
     "wrap Pac-Man around the grid (horizontally)" in new TwoByTwoEmptyGrid {
       val initialState = GameState(PacMan(Position(1, 0), direction = East),
                                    None,
