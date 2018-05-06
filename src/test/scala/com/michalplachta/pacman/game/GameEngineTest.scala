@@ -117,7 +117,7 @@ class GameEngineTest extends WordSpec with Matchers {
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
-        GameEngine.changePacMansDirection(initialState, East)
+        GameEngine.changePacMansDirection(East)(initialState)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
       nextState.pacMan should be(PacMan(Position(1, 0), direction = East))
     }
@@ -128,7 +128,7 @@ class GameEngineTest extends WordSpec with Matchers {
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
-        GameEngine.changePacMansDirection(initialState, West)
+        GameEngine.changePacMansDirection(West)(initialState)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
       nextState.pacMan should be(PacMan(Position(0, 0), direction = West))
     }
@@ -139,7 +139,7 @@ class GameEngineTest extends WordSpec with Matchers {
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
-        GameEngine.changePacMansDirection(initialState, North)
+        GameEngine.changePacMansDirection(North)(initialState)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
       nextState.pacMan should be(PacMan(Position(1, 0), direction = North))
     }
@@ -150,7 +150,7 @@ class GameEngineTest extends WordSpec with Matchers {
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
-        GameEngine.changePacMansDirection(initialState, South)
+        GameEngine.changePacMansDirection(South)(initialState)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
       nextState.pacMan should be(PacMan(Position(1, 1), direction = South))
     }
@@ -161,7 +161,7 @@ class GameEngineTest extends WordSpec with Matchers {
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
-        GameEngine.changePacMansDirection(initialState, North)
+        GameEngine.changePacMansDirection(North)(initialState)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
       nextState.pacMan should be(PacMan(Position(1, 0), direction = North))
     }

@@ -9,24 +9,34 @@ import com.michalplachta.pacman.http.HttpRoutes.{
   getGameRoute,
   setDirectionRoute
 }
-import com.michalplachta.pacman.state.MultipleGamesAtomicState
+import com.michalplachta.pacman.state.MultipleGamesState
 import monix.execution.Scheduler
+import monix.execution.atomic.Atomic
 
 import scala.concurrent.duration._
 
 class StatefulHttpRoute(tickScheduler: Scheduler,
                         tickDuration: FiniteDuration) {
-  private val atomicState = new MultipleGamesAtomicState
+  private val state = Atomic(Map.empty[Int, GameState])
 
   tickScheduler.scheduleWithFixedDelay(0.seconds, tickDuration) {
-    atomicState.tickAllGames(GameEngine.movePacMan)
+    state.transform(MultipleGamesState.tickAllGames(GameEngine.movePacMan))
   }
 
+  def createGame: String => Either[String, GameState] =
+    GridRepository.gridByName.andThen(GameEngine.start)
+
+  def addGame(game: GameState): Int =
+    state.transformAndExtract(MultipleGamesState.addGame(game))
+
+  def getGame(gameId: Int): Option[GameState] =
+    MultipleGamesState.getGame(gameId)(state.get)
+
+  def updateGame(gameId: Int, gameState: GameState): Unit =
+    state.transform(MultipleGamesState.updateGame(gameId, gameState))
+
   val route: Route =
-    createGameRoute(GridRepository.gridByName.andThen(GameEngine.start),
-                    atomicState.addNewGame) ~
-      getGameRoute[GameState](atomicState.getGame, _.pacMan) ~
-      setDirectionRoute(atomicState.getGame,
-                        atomicState.setGame,
-                        atomicState.setDirection)
+    createGameRoute(createGame, addGame) ~
+      getGameRoute[GameState](getGame, _.pacMan) ~
+      setDirectionRoute(getGame, updateGame, GameEngine.changePacMansDirection)
 }

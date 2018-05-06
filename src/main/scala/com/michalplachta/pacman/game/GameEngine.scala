@@ -36,8 +36,8 @@ object GameEngine {
     else gameState
   }
 
-  def changePacMansDirection(gameState: GameState,
-                             newDirection: Direction): GameState = {
+  def changePacMansDirection(newDirection: Direction)(
+      gameState: GameState): GameState = {
     gameState.lens(_.nextPacManDirection).set(Some(newDirection))
   }
 
