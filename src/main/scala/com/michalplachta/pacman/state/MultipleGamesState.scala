@@ -1,23 +1,18 @@
 package com.michalplachta.pacman.state
 
-import com.michalplachta.pacman.game.data.GameState
-
 object MultipleGamesState {
-  def addGame(game: GameState)(
-      state: Map[Int, GameState]): (Int, Map[Int, GameState]) = {
+  def addGame[G](game: G)(state: Map[Int, G]): (Int, Map[Int, G]) = {
     val gameId = state.size
     val newState = state + (gameId -> game)
     (gameId, newState)
   }
 
-  def getGame(gameId: Int)(state: Map[Int, GameState]): Option[GameState] =
+  def getGame[G](gameId: Int)(state: Map[Int, G]): Option[G] =
     state.get(gameId)
 
-  def updateGame(gameId: Int, game: GameState)(
-      state: Map[Int, GameState]): Map[Int, GameState] =
+  def updateGame[G](gameId: Int, game: G)(state: Map[Int, G]): Map[Int, G] =
     state.updated(gameId, game)
 
-  def tickAllGames(tickF: GameState => GameState)(
-      state: Map[Int, GameState]): Map[Int, GameState] =
-    state.mapValues(tickF)
+  def tickAllGames[G](tick: G => G)(state: Map[Int, G]): Map[Int, G] =
+    state.mapValues(tick)
 }
