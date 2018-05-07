@@ -1,4 +1,43 @@
-# Workshop: TDDing Functional Web Apps
+# Pac-Man multiplayer server - Scala, FP & Service Meshes
+Project is a playground for playing with simple functional programming tools in Scala to build services that are easily deployable, scalable and monitored. It is used in some of [my](https://www.michalplachta.com) articles, workshops and talks which are listed at the bottom.
+
+The application can be built and deployed to [Docker](https://www.docker.com/) and/or [Kubernetes](https://kubernetes.io) with [Istio](https://istio.io/docs/setup/kubernetes/quick-start.html) service mesh.
+
+### Building & deploying
+The following assumes that you have `docker`, `minikube`, `kubectl` and `istioctl` commands available. Please refer to [Minikube section in this tutorial to set it up before moving on](https://istio.io/docs/setup/kubernetes/quick-start.html)
+
+```
+> sbt assembly
+> eval $(minikube docker-env)
+> docker build -t pacman-backend:v1 .
+> kubectl apply -f <(istioctl kube-inject --debug -f kube/pacman.yaml)
+
+> kubectl get pods
+NAME                          READY     STATUS    RESTARTS   AGE
+backend-v1-7cdf6bd88c-7dffb   2/2       Running   0          48m
+
+> kubectl port-forward svc/backend-service 8080:8080
+Forwarding from 127.0.0.1:8080 -> 8080
+Forwarding from [::1]:8080 -> 8080
+```
+
+### Testing manually using cURL
+```
+> curl -H "Content-Type: application/json" -v http://localhost:8080/games -d '{ "gridName": "small" }'
+{"gameId":1}
+> curl http://localhost:8080/games/1
+{"pacMan":{"position":{"x":0,"y":0},"direction":"east"}}
+> curl http://localhost:8080/games/1
+{"pacMan":{"position":{"x":1,"y":0},"direction":"east"}}
+> curl http://localhost:8080/games/1
+{"pacMan":{"position":{"x":2,"y":0},"direction":"east"}}
+> curl -XPUT -H "Content-Type: application/json" http://localhost:8080/games/1/direction -d '{ "newDirection": "south" }'
+OK
+> curl http://localhost:8080/games/1
+{"pacMan":{"position":{"x":2,"y":1},"direction":"south"}}
+```
+
+## Workshop: TDDing Functional Web Apps
 Get some theoretical and practical overview of the TDD approach & Functional Programming by creating a multiplayer Pac-Man game server.
 
 * First steps in Scala and Scalatest.
@@ -6,9 +45,9 @@ Get some theoretical and practical overview of the TDD approach & Functional Pro
 * Purely functional approach (separated data and behaviors, no exceptions, ADTs, `Option`s).
 * Modeling using immutable structures.
 * Separating the concerns by using functions as input parameters.
-* Using Monix Atomic to handle state.
-* Using optics to deal with immutable changing data.
+* Creating loosely coupled modules by using type parameters.
 * Using function composition to connect all the dots.
+* Using optics to deal with immutable changing data.
 
 ### Requirements
 - Familiarity with basic Scala syntax (e.g. first 2 weeks of [Functional Programming Principles in Scala](https://www.coursera.org/learn/progfun1) or [Scala Tutorial](https://www.scala-exercises.org/scala_tutorial/terms_and_types))
@@ -48,45 +87,8 @@ Get some theoretical and practical overview of the TDD approach & Functional Pro
 - **reading**: 
   - blog post: [Building functional & testable HTTP APIs](http://michalplachta.com/2018/02/19/building-functional-testable-http-apis/)
   
-#### Part IV: Handling state
-- **theory**
-  - separating state handling from logic (even when state is accessed concurrently)
-  - most of our app is pure & stateless (even HTTP) - now we are entering impure land
-  - Monix `Atomic` as a bridge towards more functional solutions
-- **practice** - `MultipleGamesAtomicStateTest`
-  - live coding `"allow adding a new game"` test and implementation
-  - *TODO*: implement `"allow updating an existing game"` failing tests and make them green
-  - *TODO*: implement `"update all games on tick"` failing tests and make them green
-  - *TODO (optional)*: does `MultipleGamesAtomicState` need to know about `GameState`?
-  
-#### Part V: Connecting all dots
+#### Part IV: Connecting all dots
 - **theory**
   - integration tests without running a server?
 - **practice**
   - *TODO*: make `StatefulHttpRouteTest` green
-
-## Game Features
-
-### Grid setup
-  * There is a finite grid of cells.
-  * Cells are either usable or blocked (a wall).
-  * One of the usable cells can be occupied by Pac-Man.
-
-### Movement
-  * Pac-Man has a direction.
-  * Pac-Man moves into the next cell in the desired direction.
-  * Pac-Man cannot go through walls.
-  * Pac-Man stops if the next cell in the desired direction is a wall.
-  * Pac-Man wraps around the board.
-  
-### Player
-  * Player can change Pac-Man's direction by rotating it.
-  * Player cannot rotate Pac-Man into a wall.
-  
-### Dots
-  * A usable cell can have a dot inside.
-  * Initially all usable cells have dots.
-  * Pac-Man eats a dot by going into a cell with dot inside.
-  
-### Gameplay
-  * Score is a number of eaten dots.

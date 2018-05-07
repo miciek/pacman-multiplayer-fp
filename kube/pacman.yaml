@@ -1,0 +1,53 @@
+##################################################################################################
+# Backend service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    app: backend
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: backend
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: backend-v1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backend
+        version: v1
+    spec:
+      containers:
+      - name: backend
+        image: pacman-backend:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+---
+###########################################################################
+# Ingress resource (gateway)
+##########################################################################
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /backend
+        backend:
+          serviceName: backend-service
+          servicePort: 8080
+---

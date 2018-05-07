@@ -24,6 +24,8 @@ libraryDependencies ++= {
   )
 }
 
+mainClass in assembly := Some("com.michalplachta.pacman.Main")
+
 scalacOptions ++= Seq(
   "-unchecked",
   "-Ywarn-unused-import",
