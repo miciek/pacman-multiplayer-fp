@@ -3,7 +3,7 @@ package com.michalplachta.pacman
 import akka.http.scaladsl.server.HttpApp
 import com.typesafe.config.ConfigFactory
 import monix.execution.Scheduler
-
+import akka.http.scaladsl.server._
 import scala.concurrent.duration._
 
 object Main extends App {
@@ -17,7 +17,8 @@ object Main extends App {
     Scheduler.singleThread(name = "tick-games-thread"),
     tickDuration)
   val httpApp = new HttpApp {
-    override protected def routes = server.route
+    override protected def routes: Route =
+      Route.seal(pathPrefix("backend") { server.route })
   }
   httpApp.startServer(host, port)
 }

@@ -8,6 +8,14 @@ import io.circe.generic.auto._
 import DirectionAsJson._
 
 object HttpRoutes extends Directives {
+  val hello: Route = {
+    pathEndOrSingleSlash {
+      get {
+        complete("oh yeah")
+      }
+    }
+  }
+
   def createGameRoute[G](createGame: String => Either[String, G],
                          addNewGame: G => Int): Route =
     path("games") {

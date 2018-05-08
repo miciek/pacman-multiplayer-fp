@@ -6,36 +6,25 @@ The application can be built and deployed to [Docker](https://www.docker.com/) a
 ### Building & deploying
 The following assumes that you have `docker`, `minikube`, `kubectl` and `istioctl` commands available. Please refer to [Minikube section in this tutorial to set it up before moving on](https://istio.io/docs/setup/kubernetes/quick-start.html)
 
-```
-> sbt assembly
-> eval $(minikube docker-env)
-> docker build -t pacman-backend:v1 .
-> kubectl apply -f <(istioctl kube-inject --debug -f kube/pacman.yaml)
-
-> kubectl get pods
-NAME                          READY     STATUS    RESTARTS   AGE
-backend-v1-7cdf6bd88c-7dffb   2/2       Running   0          48m
-
-> kubectl port-forward svc/backend-service 8080:8080
-Forwarding from 127.0.0.1:8080 -> 8080
-Forwarding from [::1]:8080 -> 8080
-```
+Run [build_and_deploy.sh](./build_and_deploy.sh) to build fat-jar, docker image and deploy to `minikube` with `istio` sidecars.
 
 ### Testing manually using cURL
 ```
 > curl -H "Content-Type: application/json" -v http://localhost:8080/games -d '{ "gridName": "small" }'
 {"gameId":1}
-> curl http://localhost:8080/games/1
+> curl http://localhost:8080/backend/games/1
 {"pacMan":{"position":{"x":0,"y":0},"direction":"east"}}
-> curl http://localhost:8080/games/1
+> curl http://localhost:8080/backend/games/1
 {"pacMan":{"position":{"x":1,"y":0},"direction":"east"}}
-> curl http://localhost:8080/games/1
+> curl http://localhost:8080/backend/games/1
 {"pacMan":{"position":{"x":2,"y":0},"direction":"east"}}
 > curl -XPUT -H "Content-Type: application/json" http://localhost:8080/games/1/direction -d '{ "newDirection": "south" }'
 OK
-> curl http://localhost:8080/games/1
+> curl http://localhost:8080/backend/games/1
 {"pacMan":{"position":{"x":2,"y":1},"direction":"south"}}
 ```
+
+If deploying to `minikube`, please use `$GATEWAY_URL` instead of `localhost`. You can obtain this URL using `export GATEWAY_URL=$(minikube ip):$(kubectl get svc istio-ingress -n istio-system -o 'jsonpath={.spec.ports[0].nodePort}')`.
 
 ## Workshop: TDDing Functional Web Apps
 Get some theoretical and practical overview of the TDD approach & Functional Programming by creating a multiplayer Pac-Man game server.
