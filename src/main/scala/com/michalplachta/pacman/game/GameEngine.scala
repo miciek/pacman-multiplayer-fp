@@ -11,15 +11,14 @@ object GameEngine {
   }
 
   def movePacMan(gameState: GameState): GameState = {
-    def wrap(position: Position): Position = {
-      val Grid(width, height, _, _) = gameState.grid
-      Position((position.x + width) % width, (position.y + height) % height)
-    }
-
     val oldPosition = gameState.pacMan.position
     val newDirection =
       gameState.nextPacManDirection.getOrElse(gameState.pacMan.direction)
 
+    def wrap(position: Position): Position = {
+      val Grid(width, height, _, _) = gameState.grid
+      Position((position.x + width) % width, (position.y + height) % height)
+    }
     val newPosition = wrap(newDirection match {
       case East  => oldPosition.copy(x = oldPosition.x + 1)
       case West  => oldPosition.copy(x = oldPosition.x - 1)
@@ -30,6 +29,8 @@ object GameEngine {
     if (isPositionLegal(gameState.grid, newPosition))
       gameState.copy(pacMan = PacMan(newPosition, newDirection),
                      dotCells = gameState.dotCells - newPosition)
+    else if (newDirection != gameState.pacMan.direction)
+      movePacMan(changePacMansDirection(gameState.pacMan.direction)(gameState))
     else gameState
   }
 

@@ -163,7 +163,7 @@ class GameEngineTest extends WordSpec with Matchers {
                                    grid,
                                    Set.empty)
       val stateWithChangedDirection =
-        GameEngine.changePacMansDirection(North)(initialState)
+        GameEngine.changePacMansDirection(East)(initialState)
       val nextState = GameEngine.movePacMan(stateWithChangedDirection)
       nextState.pacMan should be(PacMan(Position(1, 0), direction = North))
     }
