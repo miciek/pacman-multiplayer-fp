@@ -2,20 +2,12 @@ package com.michalplachta.pacman.http
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
-import com.michalplachta.pacman.game.data.{Direction, PacMan}
+import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import DirectionAsJson._
 
 object HttpRoutes extends Directives {
-  val hello: Route = {
-    pathEndOrSingleSlash {
-      get {
-        complete("oh yeah")
-      }
-    }
-  }
-
   def createGameRoute[G](createGame: String => Either[String, G],
                          addNewGame: G => Int): Route =
     path("games") {
@@ -67,4 +59,12 @@ object HttpRoutes extends Directives {
         }
       }
     }
+
+  def getGridRoute(getGrid: String => Grid): Route = {
+    path("grids" / Segment) { gridName =>
+      get {
+        complete(GridResponse(getGrid(gridName)))
+      }
+    }
+  }
 }

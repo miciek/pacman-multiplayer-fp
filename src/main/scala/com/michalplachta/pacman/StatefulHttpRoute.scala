@@ -7,7 +7,8 @@ import akka.http.scaladsl.server.RouteConcatenation._
 import com.michalplachta.pacman.http.HttpRoutes.{
   createGameRoute,
   getGameRoute,
-  setDirectionRoute
+  setDirectionRoute,
+  getGridRoute
 }
 import monix.execution.Scheduler
 
@@ -34,5 +35,6 @@ class StatefulHttpRoute(tickScheduler: Scheduler,
       getGameRoute[GameState](state.get, _.pacMan) ~
       setDirectionRoute(state.get,
                         state.update,
-                        GameEngine.changePacMansDirection)
+                        GameEngine.changePacMansDirection) ~
+      getGridRoute(GridRepository.gridByName)
 }

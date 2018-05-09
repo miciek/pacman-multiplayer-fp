@@ -5,13 +5,13 @@ import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
 object GridRepository {
   val smallGrid = {
     val usableCells: Set[Position] = (for {
-      x <- 0 to 2
-      y <- 0 to 2
+      x <- 1 to 28
+      y <- 1 to 18
     } yield Position(x, y)).toSet
-    Grid(width = 3,
-         height = 3,
+    Grid(width = 30,
+         height = 20,
          usableCells,
-         PacMan(Position(0, 0), direction = East))
+         PacMan(Position(15, 10), direction = East))
   }
 
   val gridByName: String => Grid = _ => smallGrid // more grids soon ;)

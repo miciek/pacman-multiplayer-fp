@@ -91,8 +91,8 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
       val setDirectionRoute = HttpRoutes
         .setDirectionRoute[FakeGame](_ => None, (_, _) => (), _ => game => game)
 
-      val entity = HttpEntity(`application/json`,
-                              """{ "step": 0, "newDirection": "south" }""")
+      val entity =
+        HttpEntity(`application/json`, """{ "newDirection": "south" }""")
       Put("/games/1/direction", entity) ~> setDirectionRoute ~> check {
         status shouldEqual StatusCodes.NotFound
       }
