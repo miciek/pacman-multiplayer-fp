@@ -1,0 +1,11 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: backend-v3-test
+spec:
+  destination:
+    name: backend
+  precedence: 3
+  route:
+  - labels:
+      version: v3
