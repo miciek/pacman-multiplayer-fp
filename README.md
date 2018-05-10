@@ -1,7 +1,7 @@
 # Pac-Man multiplayer server - Scala, FP & Service Meshes
 Project is a playground for playing with simple functional programming tools in Scala to build services that are easily deployable, scalable and monitored. It is used in some of [my](https://www.michalplachta.com) articles, workshops and talks which are listed at the bottom.
 
-The application can be built and deployed to [Docker](https://www.docker.com/) and/or [Kubernetes](https://kubernetes.io) with [Istio](https://istio.io/docs/setup/kubernetes/quick-start.html) service mesh.
+The application can be built and deployed to [Docker](https://www.docker.com/) and/or [Kubernetes](https://kubernetes.io) with [Istio](https://istio.io/docs/setup/kubernetes/quick-start.html) service mesh. Frontend application can be found in [Reactive Pac-Man repository](https://github.com/miciek/web-pacman-react-bacon).
 
 ### Building & deploying
 The following assumes that you have `docker`, `minikube`, `kubectl` and `istioctl` commands available. Please refer to [Minikube section in this tutorial to set it up before moving on](https://istio.io/docs/setup/kubernetes/quick-start.html)

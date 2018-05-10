@@ -1,0 +1,115 @@
+##################################################################################################
+# Backend services (including v2)
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: backend
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backend
+        version: v1
+    spec:
+      containers:
+      - name: backend
+        image: pacman-backend:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: backend-v2
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backend
+        version: v2
+    spec:
+      containers:
+      - name: backend
+        image: pacman-backend:v2
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+---
+##################################################################################################
+# Frontend service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  ports:
+  - port: 3000
+    name: http
+  selector:
+    app: frontend
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: frontend
+        version: v1
+    spec:
+      containers:
+      - name: frontend
+        image: pacman-frontend:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+---
+###########################################################################
+# Ingress resource (gateway)
+##########################################################################
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /backend.*
+        backend:
+          serviceName: backend
+          servicePort: 8080
+      - path: /
+        backend:
+          serviceName: frontend
+          servicePort: 3000
+      - path: /static.*
+        backend:
+          serviceName: frontend
+          servicePort: 3000
+---
