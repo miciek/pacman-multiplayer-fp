@@ -81,3 +81,8 @@ Get some theoretical and practical overview of the TDD approach & Functional Pro
   - integration tests without running a server?
 - **practice**
   - *TODO*: make `StatefulHttpRouteTest` green
+
+## Talk: Building testable APIs with functions and meshes
+In this live coding talk you will learn about functional techniques that encourage separation of concerns. I will build a stateful HTTP API from highly isolated components that are easier to test than entangled spaghetti-like codebases. I will show you how tests can help us scaffold the architecture and how should we approach testing in the era of microservices. In the session I will use immutability, type parameters and function parameters as tools to implement a very practical example: Pac-Man game web server. I will code in Scala using Akka HTTP and deploy to Kubernetes with Istio service mesho.
+
+Slides are available on [speakerdeck](https://speakerdeck.com/miciek/building-testable-apis-using-functions-and-meshes).
