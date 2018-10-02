@@ -1,6 +1,6 @@
 package com.michalplachta.pacman.entangled
 
-import akka.http.scaladsl.server.HttpApp
+import akka.http.scaladsl.server.{HttpApp, Route}
 import com.typesafe.config.ConfigFactory
 
 /**
@@ -18,7 +18,7 @@ object EntangledMain extends App {
 
   val statefulRoutes = new EntangledStatefulHttpRoutes
   val httpApp = new HttpApp {
-    override protected def routes = statefulRoutes.routes
+    override protected def routes: Route = statefulRoutes.routes
   }
   httpApp.startServer(host, port)
 }

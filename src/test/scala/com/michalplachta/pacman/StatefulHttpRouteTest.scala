@@ -46,7 +46,9 @@ class StatefulHttpRouteTest extends WordSpec with Matchers with ScalatestRouteTe
 
       When("user changes the direction of the Pac-Man")
       val newDirectionRequest =
-        NewDirectionRequest(newDirection = if (pacManAfterStart.direction == West) East else West)
+        NewDirectionRequest(
+          newDirection = if (pacManAfterStart.direction == West) East else West
+        )
       Put(s"/games/$gameId/direction", newDirectionRequest) ~> route ~> check {
         status shouldEqual StatusCodes.OK
       }
@@ -60,7 +62,9 @@ class StatefulHttpRouteTest extends WordSpec with Matchers with ScalatestRouteTe
           responseAs[PacManStateResponse]
         }).pacMan
 
-      pacManAfterSecondTick.direction should be(newDirectionRequest.newDirection)
+      pacManAfterSecondTick.direction should be(
+        newDirectionRequest.newDirection
+      )
     }
   }
 }

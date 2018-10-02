@@ -3,7 +3,7 @@ package com.michalplachta.pacman.game
 import com.michalplachta.pacman.game.data.{East, Grid, PacMan, Position}
 
 object GridRepository {
-  val smallGrid = {
+  private val smallGrid = {
     val usableCells: Set[Position] = (for {
       x <- 1 to 28
       y <- 1 to 18
