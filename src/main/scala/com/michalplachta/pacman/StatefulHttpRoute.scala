@@ -4,19 +4,13 @@ import akka.http.scaladsl.server.Route
 import com.michalplachta.pacman.game.{GameEngine, GridRepository}
 import com.michalplachta.pacman.game.data.GameState
 import akka.http.scaladsl.server.RouteConcatenation._
-import com.michalplachta.pacman.http.HttpRoutes.{
-  createGameRoute,
-  getGameRoute,
-  setDirectionRoute,
-  getGridRoute
-}
+import com.michalplachta.pacman.http.HttpRoutes.{createGameRoute, getGameRoute, getGridRoute, setDirectionRoute}
 import monix.execution.Scheduler
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration._
 
-class StatefulHttpRoute(tickScheduler: Scheduler,
-                        tickDuration: FiniteDuration) {
+class StatefulHttpRoute(tickScheduler: Scheduler, tickDuration: FiniteDuration) {
   private val state = TrieMap.empty[Int, GameState]
 
   tickScheduler.scheduleWithFixedDelay(0.seconds, tickDuration) {
@@ -29,12 +23,10 @@ class StatefulHttpRoute(tickScheduler: Scheduler,
     gameId
   }
 
-  val route: Route =
-    createGameRoute(GridRepository.gridByName.andThen(GameEngine.start),
-                    addGame) ~
-      getGameRoute[GameState](state.get, _.pacMan) ~
-      setDirectionRoute(state.get,
-                        state.update,
-                        GameEngine.changePacMansDirection) ~
-      getGridRoute(GridRepository.gridByName)
+  val route: Route = {
+    createGameRoute(GridRepository.gridByName.andThen(GameEngine.start), addGame) ~
+    getGameRoute[GameState](state.get, _.pacMan) ~
+    setDirectionRoute(state.get, state.update, GameEngine.changePacMansDirection) ~
+    getGridRoute(GridRepository.gridByName)
+  }
 }

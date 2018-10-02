@@ -8,8 +8,7 @@ import io.circe.generic.auto._
 import DirectionAsJson._
 
 object HttpRoutes extends Directives {
-  def createGameRoute[G](createGame: String => Either[String, G],
-                         addNewGame: G => Int): Route =
+  def createGameRoute[G](createGame: String => Either[String, G], addNewGame: G => Int): Route =
     path("games") {
       post {
         entity(as[StartGameRequest]) { request =>
@@ -25,17 +24,14 @@ object HttpRoutes extends Directives {
       }
     }
 
-  def getGameRoute[G](getGame: Int => Option[G],
-                      getPacMan: G => PacMan): Route =
+  def getGameRoute[G](getGame: Int => Option[G], getPacMan: G => PacMan): Route =
     path("games" / IntNumber) { gameId =>
       get {
         val maybeGame = getGame(gameId)
         maybeGame match {
           case Some(game) => complete(PacManStateResponse(getPacMan(game)))
           case _ =>
-            complete(
-              (StatusCodes.NotFound,
-               s"Pac-Man state for the game with id $gameId couldn't be found"))
+            complete((StatusCodes.NotFound, s"Pac-Man state for the game with id $gameId couldn't be found"))
         }
       }
     }

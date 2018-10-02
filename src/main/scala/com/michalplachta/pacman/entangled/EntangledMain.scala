@@ -13,8 +13,8 @@ import com.typesafe.config.ConfigFactory
   */
 object EntangledMain extends App {
   val config = ConfigFactory.load()
-  val host = config.getString("app.host")
-  val port = config.getInt("app.port")
+  val host   = config.getString("app.host")
+  val port   = config.getInt("app.port")
 
   val statefulRoutes = new EntangledStatefulHttpRoutes
   val httpApp = new HttpApp {

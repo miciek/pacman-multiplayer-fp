@@ -27,15 +27,13 @@ object GameEngine {
     })
 
     if (isPositionLegal(gameState.grid, newPosition))
-      gameState.copy(pacMan = PacMan(newPosition, newDirection),
-                     dotCells = gameState.dotCells - newPosition)
+      gameState.copy(pacMan = PacMan(newPosition, newDirection), dotCells = gameState.dotCells - newPosition)
     else if (newDirection != gameState.pacMan.direction)
       movePacMan(changePacMansDirection(gameState.pacMan.direction)(gameState))
     else gameState
   }
 
-  def changePacMansDirection(newDirection: Direction)(
-      gameState: GameState): GameState = {
+  def changePacMansDirection(newDirection: Direction)(gameState: GameState): GameState = {
     gameState.lens(_.nextPacManDirection).set(Some(newDirection))
   }
 
@@ -45,8 +43,7 @@ object GameEngine {
   }
 
   def isGridSizeValid(grid: Grid): Boolean = {
-    grid.width > 0 && grid.height > 0 && grid.usableCells.forall(cell =>
-      cell.x < grid.width && cell.y < grid.height)
+    grid.width > 0 && grid.height > 0 && grid.usableCells.forall(cell => cell.x < grid.width && cell.y < grid.height)
   }
 
   def isPositionLegal(grid: Grid, position: Position): Boolean = {

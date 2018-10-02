@@ -17,7 +17,6 @@ object DirectionAsJson {
     case "north" => Right(North)
     case "south" => Right(South)
     case other =>
-      Left(
-        s"direction of '$other' is not one of: 'west', 'east', 'north' or 'south'")
+      Left(s"direction of '$other' is not one of: 'west', 'east', 'north' or 'south'")
   }
 }

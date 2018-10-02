@@ -37,8 +37,7 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
         .createGameRoute[FakeGame](_ => Left("Not a valid grid name"), _.id)
 
       val entity =
-        HttpEntity(`application/json`,
-                   """{ "gridName": "non existing grid configuration" }""")
+        HttpEntity(`application/json`, """{ "gridName": "non existing grid configuration" }""")
       Post("/games", entity) ~> createGameRoute ~> check {
         status shouldEqual StatusCodes.NotFound
       }
@@ -81,8 +80,7 @@ class HttpRoutesTest extends WordSpec with Matchers with ScalatestRouteTest {
         _ => game => game
       )
 
-      val entity = HttpEntity(`application/json`,
-                              """{ "step": 0, "newDirection": "south" }""")
+      val entity = HttpEntity(`application/json`, """{ "step": 0, "newDirection": "south" }""")
       Put("/games/1/direction", entity) ~> setDirectionRoute ~> check {
         status shouldEqual StatusCodes.OK
       }
