@@ -1,16 +1,9 @@
-# Pac-Man multiplayer server - Scala, FP & Service Meshes
-Project is a playground for playing with simple functional programming tools in Scala to build services that are easily deployable, scalable and monitored. It is used in some of [my](https://www.michalplachta.com) articles, workshops and talks which are listed at the bottom.
-
-The application can be built and deployed to [Docker](https://www.docker.com/) and/or [Kubernetes](https://kubernetes.io) with [Istio](https://istio.io/docs/setup/kubernetes/quick-start.html) service mesh. Frontend application can be found in [Reactive Pac-Man repository](https://github.com/miciek/web-pacman-react-bacon).
-
-### Building & deploying
-The following assumes that you have `docker`, `minikube`, `kubectl` and `istioctl` commands available. Please refer to [Minikube section in this tutorial to set it up before moving on](https://istio.io/docs/setup/kubernetes/quick-start.html)
-
-Run [build_and_deploy.sh](./build_and_deploy.sh) to build fat-jar, docker image and deploy to `minikube` with `istio` sidecars.
+# Pac-Man multiplayer server - Scala & basic FP
+Project is a playground for playing with simple functional programming tools in Scala to build services that are easily testable.
 
 ### Testing manually using cURL
 ```
-> curl -H "Content-Type: application/json" -v http://localhost:8080/games -d '{ "gridName": "small" }'
+> curl -H "Content-Type: application/json" -v http://localhost:8080/backend/games -d '{ "gridName": "small" }'
 {"gameId":1}
 > curl http://localhost:8080/backend/games/1
 {"pacMan":{"position":{"x":0,"y":0},"direction":"east"}}
@@ -23,8 +16,6 @@ OK
 > curl http://localhost:8080/backend/games/1
 {"pacMan":{"position":{"x":2,"y":1},"direction":"south"}}
 ```
-
-If deploying to `minikube`, please use `$GATEWAY_URL` instead of `localhost`. You can obtain this URL using `export GATEWAY_URL=$(minikube ip):$(kubectl get svc istio-ingress -n istio-system -o 'jsonpath={.spec.ports[0].nodePort}')`.
 
 ## Workshop: TDDing Functional Web Apps
 Get some theoretical and practical overview of the TDD approach & Functional Programming by creating a multiplayer Pac-Man game server.
@@ -83,6 +74,4 @@ Get some theoretical and practical overview of the TDD approach & Functional Pro
   - *TODO*: make `StatefulHttpRouteTest` green
 
 ## Talk: Building testable APIs with functions and meshes
-In this live coding talk you will learn about functional techniques that encourage separation of concerns. I will build a stateful HTTP API from highly isolated components that are easier to test than entangled spaghetti-like codebases. I will show you how tests can help us scaffold the architecture and how should we approach testing in the era of microservices. In the session I will use immutability, type parameters and function parameters as tools to implement a very practical example: Pac-Man game web server. I will code in Scala using Akka HTTP and deploy to Kubernetes with Istio service mesho.
-
 Slides are available on [speakerdeck](https://speakerdeck.com/miciek/building-testable-apis-using-functions-and-meshes).
