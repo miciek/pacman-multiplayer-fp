@@ -6,7 +6,7 @@ import monocle.macros.syntax.lens._
 object GameEngine {
   def start(grid: Grid): Either[String, GameState] = {
     if (isGridValid(grid)) {
-      Right(GameState(grid.initialPacMan, None, grid, grid.usableCells))
+      Right(GameState(grid.initialPacMan, None, grid))
     } else Left("Grid is not valid")
   }
 
@@ -27,7 +27,7 @@ object GameEngine {
     })
 
     if (isPositionLegal(gameState.grid, newPosition))
-      gameState.copy(pacMan = PacMan(newPosition, newDirection), dotCells = gameState.dotCells - newPosition)
+      gameState.copy(pacMan = PacMan(newPosition, newDirection))
     else if (newDirection != gameState.pacMan.direction)
       movePacMan(changePacMansDirection(gameState.pacMan.direction)(gameState))
     else gameState
