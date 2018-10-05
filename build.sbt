@@ -12,25 +12,20 @@ lazy val root = (project in file("."))
       "-language:higherKinds",
       "-Xlint"
     ),
-    libraryDependencies ++= {
-      val akkaHttpV      = "10.1.1"
-      val circeV         = "0.9.3"
-      val akkaHttpCirceV = "1.20.1"
-      val monixV         = "2.3.3"
-      val monocleV       = "1.5.0-cats"
-      val scalaTestV     = "3.0.5"
-      Seq(
-        "com.typesafe.akka"          %% "akka-http-core"       % akkaHttpV,
-        "com.typesafe.akka"          %% "akka-http-spray-json" % akkaHttpV,
-        "com.github.julien-truffaut" %% "monocle-core"         % monocleV,
-        "com.github.julien-truffaut" %% "monocle-macro"        % monocleV,
-        "io.monix"                   %% "monix-execution"      % monixV,
-        "io.circe"                   %% "circe-generic"        % circeV,
-        "de.heikoseeberger"          %% "akka-http-circe"      % akkaHttpCirceV,
-        "org.scalatest"              %% "scalatest"            % scalaTestV % Test,
-        "com.typesafe.akka"          %% "akka-http-testkit"    % akkaHttpV % Test
-      )
-    },
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka"          %% "akka-http-core"       % "10.1.+",
+      "com.typesafe.akka"          %% "akka-http-spray-json" % "10.1.+",
+      "org.typelevel"              %% "cats-effect"          % "1.0.+",
+      "com.github.julien-truffaut" %% "monocle-core"         % "1.5.0-cats",
+      "com.github.julien-truffaut" %% "monocle-macro"        % "1.5.0-cats",
+      "io.monix"                   %% "monix-execution"      % "2.3.+",
+      "io.circe"                   %% "circe-generic"        % "0.9.+",
+      "de.heikoseeberger"          %% "akka-http-circe"      % "1.20.+",
+      "com.pepegar"                %% "hammock-core"         % "0.8.+",
+      "com.pepegar"                %% "hammock-circe"        % "0.8.+",
+      "org.scalatest"              %% "scalatest"            % "3.0.+" % Test,
+      "com.typesafe.akka"          %% "akka-http-testkit"    % "10.1.+" % Test
+    ),
     mainClass in assembly := Some("com.michalplachta.pacman.Main"),
     scalafmtOnCompile := true,
     addCommandAlias("formatAll", ";sbt:scalafmt;test:scalafmt;compile:scalafmt"),

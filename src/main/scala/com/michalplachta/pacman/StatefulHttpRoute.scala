@@ -1,17 +1,23 @@
 package com.michalplachta.pacman
 
 import akka.http.scaladsl.server.Route
-import com.michalplachta.pacman.game.{GameEngine, GridRepository}
+import cats.effect.IO
 import com.michalplachta.pacman.game.data.GameState
-import akka.http.scaladsl.server.RouteConcatenation._
-import com.michalplachta.pacman.http.HttpRoutes.{createGameRoute, getGameRoute, getGridRoute, setDirectionRoute}
+import com.michalplachta.pacman.game.{GameEngine, GridRepository}
+import com.michalplachta.pacman.http.HttpRoutes._
+import hammock.jvm.Interpreter
 import monix.execution.Scheduler
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration._
 
+import hammock._
+import io.circe.generic.auto._
+import hammock.circe.implicits._
+
 class StatefulHttpRoute(tickScheduler: Scheduler, tickDuration: FiniteDuration) {
-  private val state = TrieMap.empty[Int, GameState]
+  private val state                = TrieMap.empty[Int, GameState]
+  private implicit val interpreter = Interpreter[IO]
 
   tickScheduler.scheduleWithFixedDelay(0.seconds, tickDuration) {
     state.foreach { case (k, v) => state.update(k, GameEngine.movePacMan(v)) }
@@ -23,8 +29,21 @@ class StatefulHttpRoute(tickScheduler: Scheduler, tickDuration: FiniteDuration) 
     gameId
   }
 
+  def createCollectibles(id: Int, gameState: GameState, context: Map[String, String]): IO[Unit] = {
+    println(s"forwarded headers: $context")
+    Hammock
+      .request(Method.PUT,
+               Uri.unsafeParse(s"https://pacman.exul.net/collectibles/$id"),
+               context,
+               Some(gameState.grid.usableCells))
+      .as[Int]
+      .exec[IO]
+      .map(_ => ())
+  }
+
   val route: Route = {
-    createGameRoute(GridRepository.gridByName.andThen(GameEngine.start), addGame) ~
+    //createGameRoute(GridRepository.gridByName.andThen(GameEngine.start), addGame) ~
+    createGameWithCollectiblesRoute(GridRepository.gridByName.andThen(GameEngine.start), addGame, createCollectibles) ~
     getGameRoute[GameState](state.get, _.pacMan) ~
     setDirectionRoute(state.get, state.update, GameEngine.changePacMansDirection) ~
     getGridRoute(GridRepository.gridByName)

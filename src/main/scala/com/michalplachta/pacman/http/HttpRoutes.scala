@@ -1,11 +1,12 @@
 package com.michalplachta.pacman.http
 
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.{Directives, Route}
 import com.michalplachta.pacman.game.data.{Direction, Grid, PacMan}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import DirectionAsJson._
+import cats.effect.IO
 
 object HttpRoutes extends Directives {
   def createGameRoute[G](createGame: String => Either[String, G], addNewGame: G => Int): Route =
@@ -60,6 +61,40 @@ object HttpRoutes extends Directives {
     path("grids" / Segment) { gridName =>
       get {
         complete(GridResponse(getGrid(gridName)))
+      }
+    }
+  }
+
+  def createGameWithCollectiblesRoute[G](createGame: String => Either[String, G],
+                                         addNewGame: G => Int,
+                                         createCollectibles: (Int, G, Map[String, String]) => IO[Unit]): Route = {
+    def getContext(request: HttpRequest): Map[String, String] = {
+      request.headers.filter(_.name.startsWith("l5d")).map(h => (h.name, h.value)).toMap
+      Map("l5d-dst-residual" -> "/1.1/POST/pacman.exul.net/backend/games",
+          "l5d-dst-client" -> "/#/io.l5d.k8s/pacman/http/backend-test",
+          "l5d-ctx-dtab" -> "/svc=>/k8s/pacman/http/backend-test",
+          "l5d-reqid" -> "f2fd78005d756b0e",
+          "l5d-ctx-trace" -> "vYKCjy8tCNLy/XgAXXVrDvL9eABddWsOAAAAAAAAAAA=",
+          "l5d-dst-service" -> "/svc/1.1/POST/pacman.exul.net/backend/games")
+
+    }
+
+    path("games") {
+      post {
+        extractRequest { request =>
+          entity(as[StartGameRequest]) { startGame =>
+            val startedGame = createGame(startGame.gridName)
+            startedGame match {
+              case Right(game) =>
+                val gameId = addNewGame(game)
+                onSuccess(createCollectibles(gameId, game, getContext(request)).unsafeToFuture) {
+                  complete(StartGameResponse(gameId))
+                }
+              case Left(errorMessage) =>
+                complete((StatusCodes.NotFound, errorMessage))
+            }
+          }
+        }
       }
     }
   }

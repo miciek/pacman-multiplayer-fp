@@ -4,6 +4,7 @@ import akka.http.scaladsl.server.HttpApp
 import com.typesafe.config.ConfigFactory
 import monix.execution.Scheduler
 import akka.http.scaladsl.server._
+
 import scala.concurrent.duration._
 
 object Main extends App {
