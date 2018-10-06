@@ -4,6 +4,7 @@ import akka.http.scaladsl.server.HttpApp
 import com.typesafe.config.ConfigFactory
 import monix.execution.Scheduler
 import akka.http.scaladsl.server._
+import com.michalplachta.pacman.http.CollectiblesRequests
 
 import scala.concurrent.duration._
 
@@ -14,7 +15,9 @@ object Main extends App {
   val tickDuration =
     Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
-  val server = new StatefulHttpRoute(Scheduler.singleThread(name = "tick-games-thread"), tickDuration)
+  val collectiblesRequests = new CollectiblesRequests("https://pacman.exul.net/collectibles")
+  val server =
+    new StatefulHttpRoute(collectiblesRequests, Scheduler.singleThread(name = "tick-games-thread"), tickDuration)
   val httpApp = new HttpApp {
     override protected def routes: Route =
       Route.seal(pathPrefix("backend") { server.route })

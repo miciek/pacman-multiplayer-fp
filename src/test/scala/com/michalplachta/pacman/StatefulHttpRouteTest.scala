@@ -2,10 +2,10 @@ package com.michalplachta.pacman
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
+import cats.effect.IO
 import com.michalplachta.pacman.game.data._
-import com.michalplachta.pacman.http.{NewDirectionRequest, PacManStateResponse, StartGameRequest, StartGameResponse}
+import com.michalplachta.pacman.http._
 import org.scalatest.{GivenWhenThen, Matchers, WordSpec}
-
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import com.michalplachta.pacman.http.DirectionAsJson._
@@ -17,9 +17,12 @@ class StatefulHttpRouteTest extends WordSpec with Matchers with ScalatestRouteTe
   "[integration test] Stateful HTTP Route" should {
     "support the full happy path" in {
       Given("fully configured handler from Pac-Man HTTP Server")
+      val collectiblesRequests = new CollectiblesRequests("") {
+        override def create(id: Int, positions: Set[Position], headers: Map[String, String]): IO[Unit] = IO.unit
+      }
       val tickDuration = 1.second
       val scheduler    = TestScheduler()
-      val route        = new StatefulHttpRoute(scheduler, tickDuration).route
+      val route        = new StatefulHttpRoute(collectiblesRequests, scheduler, tickDuration).route
 
       When("a new game is started")
       val startGameRequest = StartGameRequest(gridName = "small")
