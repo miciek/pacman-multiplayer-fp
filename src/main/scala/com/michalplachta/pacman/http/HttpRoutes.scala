@@ -70,15 +70,6 @@ object HttpRoutes extends Directives {
                                          createCollectibles: (Int, G, Map[String, String]) => IO[Unit]): Route = {
     def getContext(request: HttpRequest): Map[String, String] = {
       request.headers.filter(_.name.startsWith("l5d")).map(h => (h.name, h.value)).toMap
-      Map(
-        "l5d-dst-residual" -> "/1.1/POST/pacman.exul.net/backend/games",
-        "l5d-dst-client"   -> "/#/io.l5d.k8s/pacman/http/backend-test",
-        "l5d-ctx-dtab"     -> "/svc=>/k8s/pacman/http/backend-test",
-        "l5d-reqid"        -> "f2fd78005d756b0e",
-        "l5d-ctx-trace"    -> "vYKCjy8tCNLy/XgAXXVrDvL9eABddWsOAAAAAAAAAAA=",
-        "l5d-dst-service"  -> "/svc/1.1/POST/pacman.exul.net/backend/games"
-      )
-
     }
 
     path("games") {
