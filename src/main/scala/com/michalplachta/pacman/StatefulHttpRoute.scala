@@ -16,7 +16,11 @@ class StatefulHttpRoute(collectiblesRequests: CollectiblesRequests,
                         tickDuration: FiniteDuration) {
   private val state = TrieMap.empty[Int, GameState]
   tickScheduler.scheduleWithFixedDelay(0.seconds, tickDuration) {
-    state.foreach { case (k, v) => state.update(k, GameEngine.movePacMan(v)) }
+    state.foreach {
+      case (gameId, gameState) =>
+        state.update(gameId, GameEngine.movePacMan(gameState))
+        collectiblesRequests.collect(gameId, gameState.pacMan.position).unsafeRunAsyncAndForget()
+    }
   }
 
   def addGame(game: GameState): Int = {
