@@ -15,7 +15,7 @@ object Main extends App {
   val tickDuration =
     Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
-  val collectiblesRequests = new CollectiblesRequests("https://pacman.exul.net/collectibles")
+  val collectiblesRequests = new CollectiblesRequests("http://pacman.prod:4140/collectibles")
   val server =
     new StatefulHttpRoute(collectiblesRequests, Scheduler.singleThread(name = "tick-games-thread"), tickDuration)
   val httpApp = new HttpApp {
