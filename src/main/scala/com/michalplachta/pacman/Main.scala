@@ -9,13 +9,14 @@ import com.michalplachta.pacman.http.CollectiblesRequests
 import scala.concurrent.duration._
 
 object Main extends App {
-  val config = ConfigFactory.load()
-  val host   = config.getString("app.host")
-  val port   = config.getInt("app.port")
+  val config          = ConfigFactory.load()
+  val host            = config.getString("app.host")
+  val port            = config.getInt("app.port")
+  val collectiblesUri = config.getString("collectiblesUri")
   val tickDuration =
     Duration.fromNanos(config.getDuration("app.tick-duration").toNanos)
 
-  val collectiblesRequests = new CollectiblesRequests("http://pacman.prod:4140/collectibles")
+  val collectiblesRequests = new CollectiblesRequests(s"$collectiblesUri")
   val server =
     new StatefulHttpRoute(collectiblesRequests, Scheduler.singleThread(name = "tick-games-thread"), tickDuration)
   val httpApp = new HttpApp {
